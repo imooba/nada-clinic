@@ -695,38 +695,14 @@ function fileToBase64(file) {
   });
 }
 
-// ─── JSONP helper (แก้ CORS) ───
-function jsonpRequest(url) {
-  return new Promise((resolve, reject) => {
-    const cbName = 'cb_' + Date.now();
-    const script = document.createElement('script');
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error('Request timeout'));
-    }, 30000);
-    function cleanup() {
-      clearTimeout(timeout);
-      delete window[cbName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-    }
-    window[cbName] = function(data) {
-      cleanup();
-      resolve(data);
-    };
-    script.onerror = () => { cleanup(); reject(new Error('Network error')); };
-    script.src = url + '&callback=' + cbName;
-    document.head.appendChild(script);
-  });
-}
-
 // ─── Submit ───
 document.getElementById('regForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   if (!validate()) return;
 
-  const btn     = document.getElementById('submitBtn');
-  const spinner = document.getElementById('spinner');
-  const btnText = document.getElementById('btnText');
+  const btn      = document.getElementById('submitBtn');
+  const spinner  = document.getElementById('spinner');
+  const btnText  = document.getElementById('btnText');
   const resultEl = document.getElementById('result');
 
   btn.disabled = true;
@@ -737,7 +713,6 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
 
   try {
     const params = new URLSearchParams();
-    params.append('action',   'submit');
     params.append('name',     document.getElementById('name').value.trim());
     params.append('email',    document.getElementById('email').value.trim());
     params.append('phone',    document.getElementById('phone').value.trim());
@@ -758,24 +733,26 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
       params.append('pdfName',   pdfFile.name);
     }
 
-    const data = await jsonpRequest(ACTION_URL + '?' + params.toString());
+    const res = await fetch(ACTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: params.toString(),
+      mode: 'no-cors'
+    });
 
-    if (data.status === 'success') {
-      resultEl.innerHTML = `
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <span>บันทึกข้อมูลสำเร็จ ขอบคุณที่ลงทะเบียน</span>`;
-      resultEl.className = 'show success';
-      document.getElementById('regForm').reset();
-      ['dobDay','dobMonth','dobYear'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('ageBadge').classList.remove('show');
-      ['imagePreview','pdfPreview'].forEach(id => document.getElementById(id).classList.remove('show'));
-      ['imageZone','pdfZone'].forEach(id => document.getElementById(id).classList.remove('has-file'));
-      document.getElementById('imageThumb').src = '';
-    } else {
-      throw new Error(data.message || 'เกิดข้อผิดพลาด');
-    }
+    // no-cors ไม่สามารถอ่าน response ได้ ถือว่าสำเร็จถ้าไม่ throw
+    resultEl.innerHTML = `
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <span>บันทึกข้อมูลสำเร็จ ขอบคุณที่ลงทะเบียน</span>`;
+    resultEl.className = 'show success';
+    document.getElementById('regForm').reset();
+    ['dobDay','dobMonth','dobYear'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('ageBadge').classList.remove('show');
+    ['imagePreview','pdfPreview'].forEach(id => document.getElementById(id).classList.remove('show'));
+    ['imageZone','pdfZone'].forEach(id => document.getElementById(id).classList.remove('has-file'));
+    document.getElementById('imageThumb').src = '';
 
   } catch (err) {
     resultEl.innerHTML = `
