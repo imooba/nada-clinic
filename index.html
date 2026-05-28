@@ -516,7 +516,7 @@
 </div>
 
 <script>
-const ACTION_URL = "https://script.google.com/macros/s/AKfycbxIw1ysf4VyvMwO2G5saq9KA91d-cZtGcV6NNIVD115D39l_RkbaAFAAEk9W9nQM79r/exec";
+const ACTION_URL = "https://script.google.com/macros/s/AKfycbwbawdWUfDBBsT0mZOTKPQIiJw1y3yZq13bgOaayT-ksvldF2f3hMb7mJpK25Byah7SJw/exec";
 
 // ─── Populate DOB selects ───
 (function() {
@@ -711,7 +711,7 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
   resultEl.className = '';
   resultEl.style.display = 'none';
 
-  try {
+try {
     const params = new URLSearchParams();
     params.append('name',     document.getElementById('name').value.trim());
     params.append('email',    document.getElementById('email').value.trim());
@@ -733,26 +733,47 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
       params.append('pdfName',   pdfFile.name);
     }
 
+    // ลบ mode: 'no-cors' ออก เพื่อให้อ่านผลลัพธ์ที่เป็น JSON จาก Server ได้
     const res = await fetch(ACTION_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString(),
-      mode: 'no-cors'
+      body: params.toString()
     });
 
-    // no-cors ไม่สามารถอ่าน response ได้ ถือว่าสำเร็จถ้าไม่ throw
-    resultEl.innerHTML = `
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-      </svg>
-      <span>บันทึกข้อมูลสำเร็จ ขอบคุณที่ลงทะเบียน</span>`;
-    resultEl.className = 'show success';
-    document.getElementById('regForm').reset();
-    ['dobDay','dobMonth','dobYear'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('ageBadge').classList.remove('show');
-    ['imagePreview','pdfPreview'].forEach(id => document.getElementById(id).classList.remove('show'));
-    ['imageZone','pdfZone'].forEach(id => document.getElementById(id).classList.remove('has-file'));
-    document.getElementById('imageThumb').src = '';
+    const result = await res.json();
+
+    // กรณีเบอร์โทรซ้ำ
+    if (result.status === 'duplicate') {
+      alert(`เคยมีประวัติการสมัครอยู่แล้ว\nเลขสมาชิกของคุณคือ: ${result.memberId}`);
+      resultEl.innerHTML = `
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+        </svg>
+        <span>ไม่สามารถบันทึกได้ เนื่องจากเบอร์โทรนี้เป็นสมาชิกแล้ว (รหัส: ${result.memberId})</span>`;
+      resultEl.className = 'show error';
+      return; // หยุดการทำงาน
+    }
+
+    // กรณีบันทึกสำเร็จ
+    if (result.status === 'success') {
+      alert(`สมัครสำเร็จ\nเลขสมาชิกของคุณคือ: ${result.memberId}`);
+      resultEl.innerHTML = `
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>บันทึกข้อมูลสำเร็จ รหัสสมาชิก: ${result.memberId}</span>`;
+      resultEl.className = 'show success';
+      
+      // ล้างข้อมูลในฟอร์ม
+      document.getElementById('regForm').reset();
+      ['dobDay','dobMonth','dobYear'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('ageBadge').classList.remove('show');
+      ['imagePreview','pdfPreview'].forEach(id => document.getElementById(id).classList.remove('show'));
+      ['imageZone','pdfZone'].forEach(id => document.getElementById(id).classList.remove('has-file'));
+      document.getElementById('imageThumb').src = '';
+    } else {
+      throw new Error(result.message || "เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    }
 
   } catch (err) {
     resultEl.innerHTML = `
