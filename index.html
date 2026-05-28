@@ -695,12 +695,36 @@ function fileToBase64(file) {
   });
 }
 
+// ─── JSONP helper (แก้ CORS) ───
+function jsonpRequest(url) {
+  return new Promise((resolve, reject) => {
+    const cbName = 'cb_' + Date.now();
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('Request timeout'));
+    }, 30000);
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+    window[cbName] = function(data) {
+      cleanup();
+      resolve(data);
+    };
+    script.onerror = () => { cleanup(); reject(new Error('Network error')); };
+    script.src = url + '&callback=' + cbName;
+    document.head.appendChild(script);
+  });
+}
+
 // ─── Submit ───
 document.getElementById('regForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   if (!validate()) return;
 
-  const btn = document.getElementById('submitBtn');
+  const btn     = document.getElementById('submitBtn');
   const spinner = document.getElementById('spinner');
   const btnText = document.getElementById('btnText');
   const resultEl = document.getElementById('result');
@@ -713,14 +737,14 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
 
   try {
     const params = new URLSearchParams();
-    params.append('name',  document.getElementById('name').value.trim());
-    params.append('email', document.getElementById('email').value.trim());
-    params.append('phone', document.getElementById('phone').value.trim());
-    params.append('dob',   getDOBString());
-    params.append('age',   calcAge() ?? '');
+    params.append('action',   'submit');
+    params.append('name',     document.getElementById('name').value.trim());
+    params.append('email',    document.getElementById('email').value.trim());
+    params.append('phone',    document.getElementById('phone').value.trim());
+    params.append('dob',      getDOBString());
+    params.append('age',      calcAge() ?? '');
     params.append('symptoms', document.getElementById('symptoms').value.trim());
 
-    // Image
     const imgFile = document.getElementById('imageInput').files[0];
     if (imgFile) {
       params.append('imageBase64', await fileToBase64(imgFile));
@@ -728,20 +752,13 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
       params.append('imageName',   imgFile.name);
     }
 
-    // PDF
     const pdfFile = document.getElementById('pdfInput').files[0];
     if (pdfFile) {
       params.append('pdfBase64', await fileToBase64(pdfFile));
       params.append('pdfName',   pdfFile.name);
     }
 
-    const res = await fetch(ACTION_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString()
-    });
-
-    const data = await res.json();
+    const data = await jsonpRequest(ACTION_URL + '?' + params.toString());
 
     if (data.status === 'success') {
       resultEl.innerHTML = `
