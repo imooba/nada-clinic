@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ณดาคลีนิค — ระบบค้นหาข้อมูลผู้ป่วย</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background-color: #F9FAFB;
+      color: #1F2937;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      color: #2E1065;
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      color: #6B7280;
+      font-size: 0.95rem;
+    }
+    /* ช่องค้นหา */
+    .search-box {
+      background: #ffffff;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .search-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #E5E7EB;
+      border-radius: 0.5rem;
+      outline: none;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .search-input:focus {
+      border-color: #7C3AED;
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+    }
+    .btn-search {
+      background-color: #7C3AED;
+      color: #ffffff;
+      border: none;
+      padding: 0 1.75rem;
+      font-size: 1rem;
+      font-weight: 500;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background-color 0.2s;
+    }
+    .btn-search:hover {
+      background-color: #6D28D9;
+    }
+    /* Loading Spinner */
+    .loading {
+      display: none;
+      text-align: center;
+      margin: 2rem 0;
+      color: #7C3AED;
+      font-weight: 500;
+    }
+    /* รายการผลลัพธ์ */
+    .results-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    @media (min-width: 768px) {
+      .results-grid { grid-template-columns: 1fr 1fr; }
+    }
+    .patient-card {
+      background: #ffffff;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      border: 1px solid #F3F4F6;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #F3F4F6;
+      padding-bottom: 0.75rem;
+    }
+    .member-id {
+      background-color: #F5F3FF;
+      color: #7C3AED;
+      padding: 0.25rem 0.7rem;
+      border-radius: 2rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .reg-date {
+      font-size: 0.8rem;
+      color: #9CA3AF;
+    }
+    .card-body {
+      display: flex;
+      gap: 1rem;
+    }
+    .patient-img {
+      width: 90px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+      background-color: #E5E7EB;
+      border: 1px solid #E5E7EB;
+    }
+    .patient-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.9rem;
+    }
+    .patient-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 0.2rem;
+    }
+    .info-label {
+      color: #6B7280;
+      font-weight: 500;
+    }
+    .card-footer {
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid #F3F4F6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-pdf {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: #EF4444;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .btn-pdf:hover {
+      text-decoration: underline;
+    }
+    .no-file {
+      color: #9CA3AF;
+      font-size: 0.85rem;
+    }
+    .status-badge {
+      font-size: 0.85rem;
+      color: #6B7280;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #9CA3AF;
+      background: #ffffff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>ณดาคลีนิค — ค้นหาข้อมูลผู้ป่วย</h1>
+      <p>ค้นหาประวัติด้วย หมายเลขสมาชิก, เบอร์โทรศัพท์ หรือ ชื่อ-นามสกุล</p>
+    </header>
+
+    <div class="search-box">
+      <div class="search-input-wrapper">
+        <input type="text" id="searchInput" class="search-input" placeholder="พิมพ์ข้อมูลที่ต้องการค้นหาที่นี่..." autocomplete="off">
+      </div>
+      <button id="searchBtn" class="btn-search">ค้นหา</button>
+    </div>
+
+    <div id="loading" class="loading">กำลังค้นหาข้อมูลพนักงานและประวัติผู้ป่วย...</div>
+
+    <div id="resultsGrid" class="results-grid">
+      <div class="empty-state" id="emptyState">กรุณาพิมพ์ข้อมูลเพื่อเริ่มค้นหาประวัติผู้ป่วย</div>
+    </div>
+  </div>
+
+  <script>
+    // แทนที่ด้วย URL Web App ที่ได้จาก Google Apps Script ของคุณ
+    const ACTION_URL = "https://script.google.com/macros/s/AKfycbxIw1ysf4VyvMwO2G5saq9KA91d-cZtGcV6NNIVD115D39l_RkbaAFAAEk9W9nQM79r/exec";
+
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn   = document.getElementById('searchBtn');
+    const loading     = document.getElementById('loading');
+    const resultsGrid = document.getElementById('resultsGrid');
+
+    // ฟังก์ชันค้นหาข้อมูล
+    async function performSearch() {
+      const query = searchInput.value.trim();
+      
+      loading.style.display = 'block';
+      resultsGrid.innerHTML = '';
+
+      try {
+        const response = await fetch(`${ACTION_URL}?action=search&q=${encodeURIComponent(query)}`);
+        const result = await response.json();
+
+        loading.style.display = 'none';
+
+        if (result.status === 'success') {
+          const patients = result.data;
+          
+          if (patients.length === 0) {
+            resultsGrid.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลผู้ป่วยที่ตรงเงื่อนไข</div>`;
+            return;
+          }
+
+          // วนลูปวาดการ์ดผู้ป่วยแต่ละคน
+          patients.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'patient-card';
+            
+            // ตรวจสอบรูปภาพประกอบ
+            const imgTag = p.imageUrl 
+              ? `<img src="${p.imageUrl}" class="patient-img" alt="Patient Photo" onerror="this.src='https://placehold.co/90x120?text=No+Image'">`
+              : `<div style="width:90px; height:120px; background:#F3F4F6; display:flex; align-items:center; text-align:center; font-size:0.75rem; color:#9CA3AF; border-radius:0.5rem; border:1px dashed #D1D5DB; padding:5px;">ไม่มีรูปภาพ</div>`;
+
+            // ตรวจสอบเอกสาร PDF
+            const pdfTag = p.pdfUrl
+              ? `<a href="${p.pdfUrl}" target="_blank" class="btn-pdf">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="display:inline-block; vertical-align:middle;">
+                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 1A1.5 1.5 0 0 1 11 2.5v2h2v9.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5V2a.5.5 0 0 1 .5-.5h5z"/>
+                  </svg> ดูไฟล์ PDF
+                 </a>`
+              : `<span class="no-file">ไม่มีไฟล์ PDF</span>`;
+
+            card.innerHTML = `
+              <div class="card-header">
+                <span class="member-id">HN: ${p.memberId}</span>
+                <span class="reg-date">ลงทะเบียน: ${p.regDate}</span>
+              </div>
+              <div class="card-body">
+                ${imgTag}
+                <div class="patient-info">
+                  <div class="patient-name">${p.name}</div>
+                  <div><span class="info-label">เบอร์โทร:</span> ${p.phone}</div>
+                  <div><span class="info-label">อายุ:</span> ${p.age} ปี (${p.dob})</div>
+                  <div><span class="info-label">อาการเบื้องต้น:</span> ${p.symptoms}</div>
+                  <div style="margin-top:4px; padding-top:4px; border-top:1px dashed #E5E7EB;">
+                    <span class="info-label" style="color:#7C3AED;">คำวินิจฉัย:</span> ${p.diagnosis}
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                ${pdfTag}
+                <span class="status-badge">นัดครั้งถัดไป: <b style="color:#111827">${p.nextAppointment}</b></span>
+              </div>
+            `;
+            resultsGrid.appendChild(card);
+          });
+
+        } else {
+          resultsGrid.innerHTML = `<div class="empty-state" style="color:red;">เกิดข้อผิดพลาด: ${result.message}</div>`;
+        }
+      } catch (error) {
+        loading.style.display = 'none';
+        resultsGrid.innerHTML = `<div class="empty-state" style="color:red;">ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการตั้งค่า Deploy</div>`;
+        console.error(error);
+      }
+    }
+
+    // อีเวนต์กดปุ่มค้นหา และกด Enter
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+  </script>
+</body>
+</html>
