@@ -156,6 +156,73 @@
   }
   input.error { border-color: var(--error); }
 
+  /* ─── Select (DOB) ─── */
+  .dob-row {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr 1.2fr;
+    gap: 10px;
+  }
+  select {
+    width: 100%;
+    height: 46px;
+    padding: 0 12px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 15px;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' viewBox='0 0 24 24'%3E%3Cpath stroke='%23A1A1AA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    cursor: pointer;
+    transition: border-color .2s, box-shadow .2s, background-color .2s;
+    outline: none;
+  }
+  select:focus {
+    border-color: var(--purple-400);
+    background-color: var(--white);
+    box-shadow: 0 0 0 4px rgba(167,139,250,.15);
+  }
+  select.error { border-color: var(--error); }
+  select option[value=""] { color: var(--gray-400); }
+
+  .age-badge {
+    display: none;
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: var(--purple-50);
+    border: 1px solid var(--purple-200);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--purple-700);
+    font-weight: 500;
+  }
+  .age-badge.show { display: inline-block; }
+
+  /* ─── Textarea (symptoms) ─── */
+  textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 15px;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    resize: vertical;
+    line-height: 1.6;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    outline: none;
+  }
+  textarea:focus {
+    border-color: var(--purple-400);
+    background: var(--white);
+    box-shadow: 0 0 0 4px rgba(167,139,250,.15);
+  }
+
   .err-msg {
     display: none;
     font-size: 12px; color: var(--error);
@@ -333,6 +400,42 @@
         <div class="err-msg" id="err-phone">กรุณากรอกเบอร์โทรศัพท์</div>
       </div>
 
+      <!-- วันเดือนปีเกิด -->
+      <div class="field">
+        <label>วันเดือนปีเกิด <span class="req">*</span></label>
+        <div class="dob-row">
+          <select id="dobDay">
+            <option value="">วัน</option>
+          </select>
+          <select id="dobMonth">
+            <option value="">เดือน</option>
+            <option value="1">มกราคม</option>
+            <option value="2">กุมภาพันธ์</option>
+            <option value="3">มีนาคม</option>
+            <option value="4">เมษายน</option>
+            <option value="5">พฤษภาคม</option>
+            <option value="6">มิถุนายน</option>
+            <option value="7">กรกฎาคม</option>
+            <option value="8">สิงหาคม</option>
+            <option value="9">กันยายน</option>
+            <option value="10">ตุลาคม</option>
+            <option value="11">พฤศจิกายน</option>
+            <option value="12">ธันวาคม</option>
+          </select>
+          <select id="dobYear">
+            <option value="">ปี (พ.ศ.)</option>
+          </select>
+        </div>
+        <div class="age-badge" id="ageBadge"></div>
+        <div class="err-msg" id="err-dob">กรุณาเลือกวันเดือนปีเกิด</div>
+      </div>
+
+      <!-- อาการป่วย -->
+      <div class="field">
+        <label for="symptoms">อาการป่วย / เหตุผลที่มาพบแพทย์</label>
+        <textarea id="symptoms" name="symptoms" placeholder="ระบุอาการหรือความต้องการ เช่น ปวดหัว มีไข้ ต้องการตรวจสุขภาพ…"></textarea>
+      </div>
+
       <div class="divider"></div>
       <div class="section-title">ไฟล์แนบ</div>
 
@@ -413,7 +516,51 @@
 </div>
 
 <script>
-const ACTION_URL = "https://script.google.com/macros/s/AKfycbxIw1ysf4VyvMwO2G5saq9KA91d-cZtGcV6NNIVD115D39l_RkbaAFAAEk9W9nQM79r/exec";
+const ACTION_URL = "https://script.google.com/.../AKfycbyJqtGTZbf1nbs73t.../exec";
+
+// ─── Populate DOB selects ───
+(function() {
+  const dayEl = document.getElementById('dobDay');
+  for (let d = 1; d <= 31; d++) {
+    const o = document.createElement('option');
+    o.value = d; o.textContent = d;
+    dayEl.appendChild(o);
+  }
+  const yearEl = document.getElementById('dobYear');
+  const currentBE = new Date().getFullYear() + 543;
+  for (let y = currentBE; y >= currentBE - 100; y--) {
+    const o = document.createElement('option');
+    o.value = y; o.textContent = y;
+    yearEl.appendChild(o);
+  }
+})();
+
+function calcAge() {
+  const d = parseInt(document.getElementById('dobDay').value);
+  const m = parseInt(document.getElementById('dobMonth').value);
+  const y = parseInt(document.getElementById('dobYear').value);
+  if (!d || !m || !y) { document.getElementById('ageBadge').classList.remove('show'); return null; }
+  const adYear = y - 543;
+  const today = new Date();
+  let age = today.getFullYear() - adYear;
+  const monthDiff = today.getMonth() + 1 - m;
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < d)) age--;
+  const badge = document.getElementById('ageBadge');
+  badge.textContent = `อายุ ${age} ปี`;
+  badge.classList.add('show');
+  return age;
+}
+['dobDay','dobMonth','dobYear'].forEach(id => {
+  document.getElementById(id).addEventListener('change', calcAge);
+});
+
+function getDOBString() {
+  const d = document.getElementById('dobDay').value;
+  const m = document.getElementById('dobMonth').value;
+  const y = document.getElementById('dobYear').value;
+  if (!d || !m || !y) return '';
+  return `${d.toString().padStart(2,'0')}/${m.toString().padStart(2,'0')}/${y}`;
+}
 
 // ─── Drag & Drop ───
 function handleDrag(e, zoneId) {
@@ -514,6 +661,7 @@ function validate() {
   const name = document.getElementById('name').value.trim();
   const email = document.getElementById('email').value.trim();
   const phone = document.getElementById('phone').value.trim();
+  const dob = getDOBString();
 
   if (!name) { showErr('err-name'); setInputErr('name', true); ok = false; }
   else { hideErr('err-name'); setInputErr('name', false); }
@@ -524,6 +672,15 @@ function validate() {
 
   if (!phone) { showErr('err-phone'); setInputErr('phone', true); ok = false; }
   else { hideErr('err-phone'); setInputErr('phone', false); }
+
+  if (!dob) {
+    showErr('err-dob');
+    ['dobDay','dobMonth','dobYear'].forEach(id => document.getElementById(id).classList.add('error'));
+    ok = false;
+  } else {
+    hideErr('err-dob');
+    ['dobDay','dobMonth','dobYear'].forEach(id => document.getElementById(id).classList.remove('error'));
+  }
 
   return ok;
 }
@@ -559,6 +716,9 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
     params.append('name',  document.getElementById('name').value.trim());
     params.append('email', document.getElementById('email').value.trim());
     params.append('phone', document.getElementById('phone').value.trim());
+    params.append('dob',   getDOBString());
+    params.append('age',   calcAge() ?? '');
+    params.append('symptoms', document.getElementById('symptoms').value.trim());
 
     // Image
     const imgFile = document.getElementById('imageInput').files[0];
@@ -591,6 +751,8 @@ document.getElementById('regForm').addEventListener('submit', async function(e) 
         <span>บันทึกข้อมูลสำเร็จ ขอบคุณที่ลงทะเบียน</span>`;
       resultEl.className = 'show success';
       document.getElementById('regForm').reset();
+      ['dobDay','dobMonth','dobYear'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('ageBadge').classList.remove('show');
       ['imagePreview','pdfPreview'].forEach(id => document.getElementById(id).classList.remove('show'));
       ['imageZone','pdfZone'].forEach(id => document.getElementById(id).classList.remove('has-file'));
       document.getElementById('imageThumb').src = '';
