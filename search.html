@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ณดาคลีนิค — ระบบค้นหาข้อมูลผู้ป่วย</title>
+  <title>ณดาคลีนิค — ระบบค้นหาและแก้ไขข้อมูลผู้ป่วย</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -36,14 +36,13 @@
       background: #ffffff;
       padding: 1.5rem;
       border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
       display: flex;
       gap: 1rem;
       margin-bottom: 2rem;
     }
     .search-input-wrapper {
       flex: 1;
-      position: relative;
     }
     .search-input {
       width: 100%;
@@ -53,7 +52,6 @@
       border-radius: 0.5rem;
       outline: none;
       font-family: inherit;
-      transition: all 0.2s;
     }
     .search-input:focus {
       border-color: #7C3AED;
@@ -69,12 +67,9 @@
       border-radius: 0.5rem;
       cursor: pointer;
       font-family: inherit;
-      transition: background-color 0.2s;
     }
-    .btn-search:hover {
-      background-color: #6D28D9;
-    }
-    /* Loading Spinner */
+    .btn-search:hover { background-color: #6D28D9; }
+    
     .loading {
       display: none;
       text-align: center;
@@ -82,6 +77,7 @@
       color: #7C3AED;
       font-weight: 500;
     }
+
     /* รายการผลลัพธ์ */
     .results-grid {
       display: grid;
@@ -100,39 +96,30 @@
       display: flex;
       flex-direction: column;
       gap: 1rem;
-      position: relative;
-      overflow: hidden;
     }
     .card-header {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       border-bottom: 1px solid #F3F4F6;
       padding-bottom: 0.75rem;
     }
     .member-id {
       background-color: #F5F3FF;
       color: #7C3AED;
-      padding: 0.25rem 0.7rem;
+      padding: 0.25rem 0.7 r;
       border-radius: 2rem;
       font-size: 0.85rem;
       font-weight: 600;
     }
-    .reg-date {
-      font-size: 0.8rem;
-      color: #9CA3AF;
-    }
-    .card-body {
-      display: flex;
-      gap: 1rem;
-    }
+    .reg-date { font-size: 0.8rem; color: #9CA3AF; }
+    .card-body { display: flex; gap: 1rem; }
     .patient-img {
       width: 90px;
       height: 120px;
       object-fit: cover;
       border-radius: 0.5rem;
       background-color: #E5E7EB;
-      border: 1px solid #E5E7EB;
     }
     .patient-info {
       flex: 1;
@@ -144,13 +131,12 @@
     .patient-name {
       font-size: 1.1rem;
       font-weight: 600;
-      color: #111827;
-      margin-bottom: 0.2rem;
+      color: #7C3AED;
+      cursor: pointer;
+      text-decoration: underline;
     }
-    .info-label {
-      color: #6B7280;
-      font-weight: 500;
-    }
+    .patient-name:hover { color: #5B21B6; }
+    .info-label { color: #6B7280; font-weight: 500; }
     .card-footer {
       margin-top: auto;
       padding-top: 0.75rem;
@@ -159,47 +145,93 @@
       justify-content: space-between;
       align-items: center;
     }
-    .btn-pdf {
-      display: inline-flex;
+    .btn-pdf { color: #EF4444; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
+    .btn-pdf:hover { text-decoration: underline; }
+    .no-file { color: #9CA3AF; font-size: 0.85rem; }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: #9CA3AF; background: #ffffff; border-radius: 1rem; }
+
+    /* ==========================================
+       สไตล์สำหรับ Modal หน้าต่างแก้ไขข้อมูล
+       ========================================== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      justify-content: center;
       align-items: center;
-      gap: 0.3rem;
-      color: #EF4444;
-      text-decoration: none;
-      font-size: 0.85rem;
-      font-weight: 500;
+      padding: 1rem;
     }
-    .btn-pdf:hover {
-      text-decoration: underline;
-    }
-    .no-file {
-      color: #9CA3AF;
-      font-size: 0.85rem;
-    }
-    .status-badge {
-      font-size: 0.85rem;
-      color: #6B7280;
-    }
-    .empty-state {
-      text-align: center;
-      padding: 3rem 1rem;
-      color: #9CA3AF;
+    .modal.show { display: flex; }
+    .modal-content {
       background: #ffffff;
+      width: 100%;
+      max-width: 600px;
       border-radius: 1rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      max-height: 90vh;
+      overflow-y: auto;
     }
+    .modal-title {
+      font-size: 1.5rem;
+      color: #2E1065;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #F3F4F6;
+      padding-bottom: 0.5rem;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.35rem;
+      color: #374151;
+    }
+    .form-control {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      font-size: 0.95rem;
+      border: 1px solid #D1D5DB;
+      border-radius: 0.375rem;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-control:focus { border-color: #7C3AED; box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1); }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      border-top: 1px solid #F3F4F6;
+      padding-top: 1rem;
+    }
+    .btn-cancel {
+      background: #E5E7EB; color: #374151; border: none; padding: 0.5rem 1.25rem;
+      border-radius: 0.375rem; cursor: pointer; font-family: inherit; font-weight: 500;
+    }
+    .btn-save {
+      background: #7C3AED; color: #ffffff; border: none; padding: 0.5rem 1.25rem;
+      border-radius: 0.375rem; cursor: pointer; font-family: inherit; font-weight: 500;
+    }
+    .btn-save:hover { background-color: #6D28D9; }
+    .btn-cancel:hover { background-color: #D1D5DB; }
   </style>
 </head>
 <body>
 
   <div class="container">
     <header>
-      <h1>ณดาคลีนิค — ค้นหาข้อมูลผู้ป่วย</h1>
-      <p>ค้นหาประวัติด้วย หมายเลขสมาชิก, เบอร์โทรศัพท์ หรือ ชื่อ-นามสกุล</p>
+      <h1>ณดาคลีนิค — ค้นหาและแก้ไขข้อมูลผู้ป่วย</h1>
+      <p>ค้นหาประวัติผู้ป่วย และกดที่ <b style="color:#7C3AED">"ชื่อผู้ป่วย"</b> เพื่อเปิดระบบแก้ไขข้อมูล</p>
     </header>
 
     <div class="search-box">
       <div class="search-input-wrapper">
-        <input type="text" id="searchInput" class="search-input" placeholder="พิมพ์ข้อมูลที่ต้องการค้นหาที่นี่..." autocomplete="off">
+        <input type="text" id="searchInput" class="search-input" placeholder="พิมพ์ชื่อ, เบอร์โทร หรือเลขสมาชิก..." autocomplete="off">
       </div>
       <button id="searchBtn" class="btn-search">ค้นหา</button>
     </div>
@@ -211,97 +243,209 @@
     </div>
   </div>
 
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-title">แก้ไขข้อมูลผู้ป่วย (<span id="modalHN"></span>)</div>
+      <form id="editForm">
+        <input type="hidden" id="editMemberId">
+
+        <div class="form-group">
+          <label>ชื่อ-นามสกุล</label>
+          <input type="text" id="editName" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>เบอร์โทรศัพท์</label>
+          <input type="text" id="editPhone" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="editEmail" class="form-control">
+        </div>
+        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label>วันเดือนปีเกิด</label>
+            <input type="text" id="editDob" class="form-control" placeholder="เช่น 01/01/2530">
+          </div>
+          <div>
+            <label>อายุ (ปี)</label>
+            <input type="number" id="editAge" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>อาการป่วยเบื้องต้น</label>
+          <textarea id="editSymptoms" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="form-group" style="background: #F5F3FF; padding: 1rem; border-radius: 0.5rem; border: 1px solid #DDD6FE;">
+          <label style="color: #7C3AED; font-weight: 600;">คำวินิจฉัยโรค (สำหรับแพทย์)</label>
+          <textarea id="editDiagnosis" class="form-control" rows="3" placeholder="ระบุผลตรวจโรคและการรักษา..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>วันนัดครั้งถัดไป</label>
+          <input type="text" id="editNextAppointment" class="form-control" placeholder="เช่น 15/06/2026 หรือระบุเวลาเพิ่มเติม">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="cancelBtn" class="btn-cancel">ยกเลิก</button>
+          <button type="submit" id="saveBtn" class="btn-save">บันทึกการแก้ไข</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
-    // แทนที่ด้วย URL Web App ที่ได้จาก Google Apps Script ของคุณ
-     const ACTION_URL = "https://script.google.com/macros/s/AKfycbwbawdWUfDBBsT0mZOTKPQIiJw1y3yZq13bgOaayT-ksvldF2f3hMb7mJpK25Byah7SJw/exec";
+    // URL Web App จาก Google Apps Script ล่าสุดของคุณ
+    const ACTION_URL = "https://script.google.com/macros/s/AKfycbxIw1ysf4VyvMwO2G5saq9KA91d-cZtGcV6NNIVD115D39l_RkbaAFAAEk9W9nQM79r/exec";
+    
+    // เก็บรหัสและข้อมูลผู้ป่วยชั่วคราวเพื่อนำมาแสดงซ้ำหลังอัปเดตสำเร็จ
+    let globalPatientsData = [];
 
     const searchInput = document.getElementById('searchInput');
     const searchBtn   = document.getElementById('searchBtn');
     const loading     = document.getElementById('loading');
     const resultsGrid = document.getElementById('resultsGrid');
 
-    // ฟังก์ชันค้นหาข้อมูล
+    // ส่วนประกอบของ Modal
+    const editModal    = document.getElementById('editModal');
+    const editForm     = document.getElementById('editForm');
+    const cancelBtn    = document.getElementById('cancelBtn');
+    const modalHN      = document.getElementById('modalHN');
+
+    // ฟังก์ชันดึงและค้นหาข้อมูล
     async function performSearch() {
       const query = searchInput.value.trim();
-      
       loading.style.display = 'block';
       resultsGrid.innerHTML = '';
 
       try {
         const response = await fetch(`${ACTION_URL}?action=search&q=${encodeURIComponent(query)}`);
         const result = await response.json();
-
         loading.style.display = 'none';
 
         if (result.status === 'success') {
-          const patients = result.data;
-          
-          if (patients.length === 0) {
-            resultsGrid.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลผู้ป่วยที่ตรงเงื่อนไข</div>`;
-            return;
-          }
-
-          // วนลูปวาดการ์ดผู้ป่วยแต่ละคน
-          patients.forEach(p => {
-            const card = document.createElement('div');
-            card.className = 'patient-card';
-            
-            // ตรวจสอบรูปภาพประกอบ
-            const imgTag = p.imageUrl 
-              ? `<img src="${p.imageUrl}" class="patient-img" alt="Patient Photo" onerror="this.src='https://placehold.co/90x120?text=No+Image'">`
-              : `<div style="width:90px; height:120px; background:#F3F4F6; display:flex; align-items:center; text-align:center; font-size:0.75rem; color:#9CA3AF; border-radius:0.5rem; border:1px dashed #D1D5DB; padding:5px;">ไม่มีรูปภาพ</div>`;
-
-            // ตรวจสอบเอกสาร PDF
-            const pdfTag = p.pdfUrl
-              ? `<a href="${p.pdfUrl}" target="_blank" class="btn-pdf">
-                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="display:inline-block; vertical-align:middle;">
-                    <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 1A1.5 1.5 0 0 1 11 2.5v2h2v9.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5V2a.5.5 0 0 1 .5-.5h5z"/>
-                  </svg> ดูไฟล์ PDF
-                 </a>`
-              : `<span class="no-file">ไม่มีไฟล์ PDF</span>`;
-
-            card.innerHTML = `
-              <div class="card-header">
-                <span class="member-id">HN: ${p.memberId}</span>
-                <span class="reg-date">ลงทะเบียน: ${p.regDate}</span>
-              </div>
-              <div class="card-body">
-                ${imgTag}
-                <div class="patient-info">
-                  <div class="patient-name">${p.name}</div>
-                  <div><span class="info-label">เบอร์โทร:</span> ${p.phone}</div>
-                  <div><span class="info-label">อายุ:</span> ${p.age} ปี (${p.dob})</div>
-                  <div><span class="info-label">อาการเบื้องต้น:</span> ${p.symptoms}</div>
-                  <div style="margin-top:4px; padding-top:4px; border-top:1px dashed #E5E7EB;">
-                    <span class="info-label" style="color:#7C3AED;">คำวินิจฉัย:</span> ${p.diagnosis}
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                ${pdfTag}
-                <span class="status-badge">นัดครั้งถัดไป: <b style="color:#111827">${p.nextAppointment}</b></span>
-              </div>
-            `;
-            resultsGrid.appendChild(card);
-          });
-
+          globalPatientsData = result.data;
+          renderPatients(globalPatientsData);
         } else {
           resultsGrid.innerHTML = `<div class="empty-state" style="color:red;">เกิดข้อผิดพลาด: ${result.message}</div>`;
         }
       } catch (error) {
         loading.style.display = 'none';
-        resultsGrid.innerHTML = `<div class="empty-state" style="color:red;">ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบการตั้งค่า Deploy</div>`;
-        console.error(error);
+        resultsGrid.innerHTML = `<div class="empty-state" style="color:red;">ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้</div>`;
       }
     }
 
-    // อีเวนต์กดปุ่มค้นหา และกด Enter
-    searchBtn.addEventListener('click', performSearch);
-    searchInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        performSearch();
+    // ฟังก์ชันวาดการ์ดผู้ป่วยลงบนหน้าจอ
+    function renderPatients(patients) {
+      resultsGrid.innerHTML = '';
+      if (patients.length === 0) {
+        resultsGrid.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลผู้ป่วยที่ตรงเงื่อนไข</div>`;
+        return;
+      }
+
+      patients.forEach((p, index) => {
+        const card = document.createElement('div');
+        card.className = 'patient-card';
+        
+        const imgTag = p.imageUrl 
+          ? `<img src="${p.imageUrl}" class="patient-img" alt="Photo" onerror="this.src='https://placehold.co/90x120?text=No+Image'">`
+          : `<div style="width:90px; height:120px; background:#F3F4F6; display:flex; align-items:center; text-align:center; font-size:0.75rem; color:#9CA3AF; border-radius:0.5rem; border:1px dashed #D1D5DB; padding:5px;">ไม่มีรูปภาพ</div>`;
+
+        const pdfTag = p.pdfUrl
+          ? `<a href="${p.pdfUrl}" target="_blank" class="btn-pdf">ดูไฟล์ PDF</a>`
+          : `<span class="no-file">ไม่มีไฟล์ PDF</span>`;
+
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="member-id">HN: ${p.memberId}</span>
+            <span class="reg-date">ลงทะเบียน: ${p.regDate}</span>
+          </div>
+          <div class="card-body">
+            ${imgTag}
+            <div class="patient-info">
+              <div class="patient-name" onclick="openEditForm(${index})">${p.name}</div>
+              <div><span class="info-label">เบอร์โทร:</span> ${p.phone}</div>
+              <div><span class="info-label">อายุ:</span> ${p.age} ปี (${p.dob})</div>
+              <div><span class="info-label">อาการเบื้องต้น:</span> ${p.symptoms}</div>
+              <div style="margin-top:4px; padding-top:4px; border-top:1px dashed #E5E7EB;">
+                <span class="info-label" style="color:#7C3AED; font-weight:600;">คำวินิจฉัย:</span> ${p.diagnosis}
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            ${pdfTag}
+            <span class="status-badge">นัดครั้งถัดไป: <b style="color:#111827">${p.nextAppointment}</b></span>
+          </div>
+        `;
+        resultsGrid.appendChild(card);
+      });
+    }
+
+    // ฟังก์ชันเปิด Modal พร้อมดึงข้อมูลเดิมผู้ป่วยมากรอกรอไว้
+    window.openEditForm = function(index) {
+      const patient = globalPatientsData[index];
+      
+      modalHN.textContent = "HN: " + patient.memberId;
+      document.getElementById('editMemberId').value = patient.memberId;
+      document.getElementById('editName').value = patient.name;
+      document.getElementById('editPhone').value = patient.phone;
+      document.getElementById('editEmail').value = patient.email;
+      document.getElementById('editDob').value = patient.dob;
+      document.getElementById('editAge').value = patient.age;
+      document.getElementById('editSymptoms').value = patient.symptoms;
+      document.getElementById('editDiagnosis').value = patient.diagnosis === "-" ? "" : patient.diagnosis;
+      document.getElementById('editNextAppointment').value = patient.nextAppointment === "-" ? "" : patient.nextAppointment;
+
+      editModal.classList.add('show');
+    };
+
+    // ปิดหน้าต่าง Modal
+    cancelBtn.addEventListener('click', () => editModal.classList.remove('show'));
+
+    // ทำการส่งข้อมูลการแก้ไขไปยัง API (doPost)
+    editForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'กำลังบันทึก...';
+
+      const params = new URLSearchParams();
+      params.append('action', 'update'); // ส่ง action บอกระบบว่านี่คือการแก้ไขข้อมูล
+      params.append('memberId', document.getElementById('editMemberId').value);
+      params.append('name', document.getElementById('editName').value.trim());
+      params.append('phone', document.getElementById('editPhone').value.trim());
+      params.append('email', document.getElementById('editEmail').value.trim());
+      params.append('dob', document.getElementById('editDob').value.trim());
+      params.append('age', document.getElementById('editAge').value);
+      params.append('symptoms', document.getElementById('editSymptoms').value.trim());
+      params.append('diagnosis', document.getElementById('editDiagnosis').value.trim());
+      params.append('nextAppointment', document.getElementById('editNextAppointment').value.trim());
+
+      try {
+        const response = await fetch(ACTION_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params.toString()
+        });
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          alert('แก้ไขและอัปเดตข้อมูลผู้ป่วยสำเร็จแล้ว!');
+          editModal.classList.remove('show');
+          performSearch(); // ค้นหาซ้ำอีกครั้งเพื่อรีเฟรชข้อมูลที่แสดงอยู่บนหน้าจอให้เป็นปัจจุบัน
+        } else {
+          alert('เกิดข้อผิดพลาด: ' + result.message);
+        }
+      } catch (err) {
+        alert('ไม่สามารถเชื่อมต่อระบบหลังบ้านได้');
+        console.error(err);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'บันทึกการแก้ไข';
       }
     });
+
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(); });
   </script>
 </body>
 </html>
