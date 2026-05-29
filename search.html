@@ -109,10 +109,10 @@
           <div><label>รหัส HN</label><input type="text" id="histHN" class="form-control" readonly></div>
           <div><label>ชื่อผู้ป่วย</label><input type="text" id="histName" class="form-control" readonly></div>
         </div>
-        <div class="form-group"><label>แพทย์ผู้รักษา</label><input type="text" id="histDoctor" class="form-control" required></div>
+        <div class="form-group"><label>*แพทย์ผู้รักษา</label><input type="text" id="histDoctor" class="form-control" required></div>
         <div class="form-group"><label>อาการ</label><textarea id="histSymptoms" class="form-control" rows="2"></textarea></div>
-        <div class="form-group"><label>คำวินิจฉัยแพทย์</label><textarea id="histDiagnosis" class="form-control" rows="2" required></textarea></div>
-        <div class="form-group"><label>ยาที่จ่าย</label><textarea id="histMedicine" class="form-control" rows="2" required></textarea></div>
+        <div class="form-group"><label>*คำวินิจฉัยแพทย์</label><textarea id="histDiagnosis" class="form-control" rows="2" required></textarea></div>
+        <div class="form-group"><label>*ยาที่จ่าย</label><textarea id="histMedicine" class="form-control" rows="2" required></textarea></div>
         <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div>
             <label>สิทธิ์ที่เบิกจ่าย</label>
@@ -124,7 +124,7 @@
               <option value="อื่นๆ">อื่นๆ</option>
             </select>
           </div>
-          <div><label>ราคา ค่ารักษา (บาท)</label><input type="number" id="histCost" class="form-control" required></div>
+          <div><label>*ราคา ค่ารักษา (บาท)</label><input type="number" id="histCost" class="form-control" required></div>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn-cancel" onclick="document.getElementById('historyModal').classList.remove('show')">ยกเลิก</button>
