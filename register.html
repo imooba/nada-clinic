@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="th">
-<header>
-<script>
-    // ตรวจสอบสิทธิ์ ถ้าไม่ได้ล็อกอินให้เด้งกลับหน้าแรก
+<head>
+  <script>
     if (localStorage.getItem('nada_logged_in') !== 'true') {
       window.location.replace('index.html');
     }
-</script>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>ณดาคลีนิค — ลงทะเบียนผู้รับบริการ</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
-<style>
+  </script>
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ณดาคลีนิค — ลงทะเบียนผู้รับบริการ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  
+  <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
@@ -40,11 +41,12 @@
   }
 
   html, body {
-    min-height: 100vh;
     font-family: 'Sarabun', sans-serif;
-    font-size: 15px;
-    background: #F7F5FF;
+    background-color: var(--gray-100);
     color: var(--gray-800);
+    line-height: 1.5;
+    padding: 2rem 1rem; /* เพิ่ม padding ตรงนี้ไม่ให้ฟอร์มชิดขอบจอเกินไป */
+    min-height: 100vh;
   }
 
   /* ─── Background decoration ─── */
@@ -68,7 +70,16 @@
     pointer-events: none;
     z-index: 0;
   }
-
+    
+  .container {
+    width: 100%;
+    max-width: 900px; /* ขยายจากเดิม (น่าจะ 500-600px) เป็น 900px */
+    margin: 0 auto;
+    background-color: var(--white);
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    padding: 3rem; /* เพิ่มพื้นที่ว่างด้านในให้ดูโปร่งขึ้น */
+  }
   /* ─── Layout ─── */
   .page-wrap {
     position: relative; z-index: 1;
@@ -366,12 +377,13 @@
 </style>
 </head>
 <body>
-<div class="container">
+  <div class="container">
     <header style="position: relative; text-align: center; margin-bottom: 2.5rem;">
       <a href="index.html" style="position: absolute; left: 0; top: 0; text-decoration: none; color: #7C3AED; font-weight: 500;">
         🏠 กลับเมนูหลัก
       </a>
-      <h1 style="font-size: 2rem; color: #2E1065; margin-bottom: 0.5rem;">ณดาคลีนิค — ลงทะเบียน</h1>
+      <h1 style="font-size: 2.2rem; color: #2E1065; margin-bottom: 0.5rem; font-family: 'Playfair Display', serif;">ณดาคลีนิค</h1>
+      <p style="color: #6B7280; font-size: 1rem;">ลงทะเบียนผู้รับบริการใหม่</p>
     </header>
 
 </div>
