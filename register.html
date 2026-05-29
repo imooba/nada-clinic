@@ -389,9 +389,9 @@
 
       <!-- Email -->
       <div class="field">
-        <label for="email">อีเมล <span class="req"></span></label>
+        <label for="email">อีเมล </label>
         <input type="email" id="email" name="email" placeholder="example@email.com" autocomplete="email" />
-        <!-- <div class="err-msg" id="err-email">กรุณากรอกอีเมลให้ถูกต้อง</div> -->
+         <div class="err-msg" id="err-email">กรุณากรอกอีเมลให้ถูกต้อง</div>
       </div>
 
       <!-- เบอร์โทร -->
@@ -469,7 +469,7 @@
       </div>
 
       <!-- PDF -->
-       <div class="field">
+        <div class="field">
         <label>เอกสารประกอบ <span style="font-weight:300;color:var(--gray-400)">(PDF เท่านั้น)</span></label>
         <div class="upload-zone" id="pdfZone" onclick="document.getElementById('pdfInput').click()"
              ondragover="handleDrag(event,'pdfZone')" ondragleave="handleDragLeave('pdfZone')"
@@ -667,7 +667,7 @@ function validate() {
   if (!name) { showErr('err-name'); setInputErr('name', true); ok = false; }
   else { hideErr('err-name'); setInputErr('name', false); }
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (email !=="" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showErr('err-email'); setInputErr('email', true); ok = false;
   } else { hideErr('err-email'); setInputErr('email', false); }
 
