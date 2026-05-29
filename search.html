@@ -326,8 +326,11 @@
         return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
       });
 
+      // 🌟 เพิ่มคำสั่ง .slice(0, 4) ตรงนี้ เพื่อตัดเอาแค่ 4 รายการแรก
+      const limitedData = sortedData.slice(0, 4);
+      
       container.innerHTML = '';
-      sortedData.forEach(h => {
+      limitedData.forEach(h => {
         container.innerHTML += `
           <div class="history-card">
             <div class="history-date">
@@ -343,6 +346,10 @@
           </div>
         `;
       });
+      // เพิ่มข้อความแจ้งกรณีมีข้อมูลมากกว่า 4 รายการ
+      if (currentHistoryData.length > 4) {
+        container.innerHTML += `<div style="text-align:center; font-size:0.85rem; color:#9CA3AF;">แสดงเฉพาะ 4 รายการล่าสุด</div>`;
+      }
     }
 
     // 3. เปิดฟอร์มเพิ่มประวัติ (กดจากการ์ดผู้ป่วย)
