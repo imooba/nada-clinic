@@ -3,18 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ณดาคลีนิค — ระบบค้นหาและบันทึกประวัติผู้ป่วย</title>
+  <title>ณดาคลีนิค — ค้นหาและประวัติการรักษา</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
-    /* สไตล์เดิมทั้งหมด... */
+    /* CSS เดิม... */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Sarabun', sans-serif; background-color: #F9FAFB; color: #1F2937; padding: 2rem 1rem; }
     .container { max-width: 1000px; margin: 0 auto; }
     header { text-align: center; margin-bottom: 2.5rem; }
     header h1 { font-size: 2rem; color: #2E1065; margin-bottom: 0.5rem; }
-    header p { color: #6B7280; font-size: 0.95rem; }
-    .search-box { background: #ffffff; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); display: flex; gap: 1rem; margin-bottom: 2rem; }
+    .search-box { background: #ffffff; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 1rem; margin-bottom: 2rem; }
     .search-input-wrapper { flex: 1; }
     .search-input { width: 100%; padding: 0.85rem 1rem; font-size: 1rem; border: 1px solid #E5E7EB; border-radius: 0.5rem; outline: none; font-family: inherit; }
     .search-input:focus { border-color: #7C3AED; box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15); }
@@ -23,7 +22,7 @@
     .loading { display: none; text-align: center; margin: 2rem 0; color: #7C3AED; font-weight: 500; }
     .results-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
     @media (min-width: 768px) { .results-grid { grid-template-columns: 1fr 1fr; } }
-    .patient-card { background: #ffffff; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #F3F4F6; display: flex; flex-direction: column; gap: 1rem; }
+    .patient-card { background: #ffffff; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #F3F4F6; display: flex; flex-direction: column; gap: 1rem; }
     .card-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #F3F4F6; padding-bottom: 0.75rem; }
     .member-id { background-color: #F5F3FF; color: #7C3AED; padding: 0.25rem 0.7rem; border-radius: 2rem; font-size: 0.85rem; font-weight: 600; }
     .reg-date { font-size: 0.8rem; color: #9CA3AF; }
@@ -31,83 +30,74 @@
     .patient-img { width: 90px; height: 120px; object-fit: cover; border-radius: 0.5rem; background-color: #E5E7EB; }
     .patient-info { flex: 1; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; }
     .patient-name { font-size: 1.1rem; font-weight: 600; color: #7C3AED; cursor: pointer; text-decoration: underline; }
-    .patient-name:hover { color: #5B21B6; }
     .info-label { color: #6B7280; font-weight: 500; }
-    .card-footer { margin-top: auto; padding-top: 0.75rem; border-top: 1px solid #F3F4F6; display: flex; justify-content: space-between; align-items: center; }
-    .btn-pdf { color: #EF4444; text-decoration: none; font-size: 0.85rem; font-weight: 500; }
-    .btn-pdf:hover { text-decoration: underline; }
-    .no-file { color: #9CA3AF; font-size: 0.85rem; }
-    .empty-state { text-align: center; padding: 3rem 1rem; color: #9CA3AF; background: #ffffff; border-radius: 1rem; }
-
-    /* ปุ่มเพิ่มประวัติรักษา */
-    .btn-add-history {
-      background-color: #10B981; color: white; border: none; padding: 0.35rem 0.75rem;
-      border-radius: 0.375rem; font-size: 0.85rem; font-weight: 500; cursor: pointer;
-      font-family: inherit; transition: background-color 0.2s;
-    }
+    .card-footer { margin-top: auto; padding-top: 0.75rem; border-top: 1px solid #F3F4F6; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;}
+    
+    /* ปุ่มใหม่ */
+    .btn-view-history { background-color: #3B82F6; color: white; border: none; padding: 0.35rem 0.75rem; border-radius: 0.375rem; font-size: 0.85rem; cursor: pointer; font-family: inherit; }
+    .btn-view-history:hover { background-color: #2563EB; }
+    .btn-add-history { background-color: #10B981; color: white; border: none; padding: 0.35rem 0.75rem; border-radius: 0.375rem; font-size: 0.85rem; cursor: pointer; font-family: inherit; }
     .btn-add-history:hover { background-color: #059669; }
 
     /* โมดอล */
-    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; }
+    .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; }
     .modal.show { display: flex; }
-    .modal-content { background: #ffffff; width: 100%; max-width: 600px; border-radius: 1rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); max-height: 90vh; overflow-y: auto; }
-    .modal-title { font-size: 1.3rem; color: #111827; margin-bottom: 1.25rem; border-bottom: 2px solid #F3F4F6; padding-bottom: 0.5rem; font-weight: 600; }
+    .modal-content { background: #ffffff; width: 100%; max-width: 650px; border-radius: 1rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-size: 1.3rem; margin-bottom: 1rem; border-bottom: 2px solid #F3F4F6; padding-bottom: 0.5rem; font-weight: 600; }
+    
+    /* สไตล์สำหรับประวัติการรักษา */
+    .history-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid #E5E7EB; }
+    .history-card { border: 1px solid #E5E7EB; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; background: #ffffff; }
+    .history-date { font-weight: 600; color: #2E1065; border-bottom: 1px dashed #E5E7EB; padding-bottom: 0.5rem; margin-bottom: 0.5rem; display: flex; justify-content: space-between; }
+    .history-item { margin-bottom: 0.35rem; font-size: 0.9rem; }
+    
     .form-group { margin-bottom: 1rem; }
     .form-group label { display: block; font-size: 0.9rem; font-weight: 500; margin-bottom: 0.35rem; color: #374151; }
     .form-control { width: 100%; padding: 0.65rem 0.75rem; font-size: 0.95rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; outline: none; font-family: inherit; }
-    .form-control:focus { border-color: #7C3AED; box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1); }
-    .form-control[readonly] { background-color: #F3F4F6; color: #6B7280; }
+    .form-control[readonly] { background-color: #F3F4F6; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem; border-top: 1px solid #F3F4F6; padding-top: 1rem; }
-    .btn-cancel { background: #E5E7EB; color: #374151; border: none; padding: 0.5rem 1.25rem; border-radius: 0.375rem; cursor: pointer; font-family: inherit; font-weight: 500; }
-    .btn-save { background: #7C3AED; color: #ffffff; border: none; padding: 0.5rem 1.25rem; border-radius: 0.375rem; cursor: pointer; font-family: inherit; font-weight: 500; }
-    .btn-save-history { background: #10B981; color: #ffffff; border: none; padding: 0.5rem 1.25rem; border-radius: 0.375rem; cursor: pointer; font-family: inherit; font-weight: 500; }
-    .btn-save:hover { background-color: #6D28D9; }
-    .btn-save-history:hover { background-color: #059669; }
+    .btn-cancel { background: #E5E7EB; border: none; padding: 0.5rem 1.25rem; border-radius: 0.375rem; cursor: pointer; font-family: inherit; font-weight: 500; }
+    .btn-save { background: #7C3AED; color: #ffffff; border: none; padding: 0.5rem 1.25rem; border-radius: 0.375rem; cursor: pointer; font-family: inherit; }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <header>
-      <h1>ณดาคลีนิค — ค้นหาและบันทึกข้อมูล</h1>
-    </header>
+    <header><h1>ณดาคลีนิค — ระบบค้นหาและบันทึกข้อมูล</h1></header>
 
     <div class="search-box">
       <div class="search-input-wrapper">
-        <input type="text" id="searchInput" class="search-input" placeholder="พิมพ์ชื่อ, เบอร์โทร หรือเลขสมาชิก..." autocomplete="off">
+        <input type="text" id="searchInput" class="search-input" placeholder="พิมพ์ชื่อ, เบอร์โทร หรือเลขสมาชิก...">
       </div>
       <button id="searchBtn" class="btn-search">ค้นหา</button>
     </div>
 
     <div id="loading" class="loading">กำลังโหลดข้อมูล...</div>
-
-    <div id="resultsGrid" class="results-grid">
-      <div class="empty-state" id="emptyState">กรุณาพิมพ์ข้อมูลเพื่อเริ่มค้นหาประวัติผู้ป่วย</div>
-    </div>
+    <div id="resultsGrid" class="results-grid"></div>
   </div>
 
-  <div id="editModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-title" style="color:#7C3AED;">แก้ไขประวัติส่วนตัว (<span id="modalHN"></span>)</div>
-      <form id="editForm">
-        <input type="hidden" id="editMemberId">
-        <div class="form-group"><label>ชื่อ-นามสกุล</label><input type="text" id="editName" class="form-control" required></div>
-        <div class="form-group"><label>เบอร์โทรศัพท์</label><input type="text" id="editPhone" class="form-control" required></div>
-        <div class="form-group"><label>Email</label><input type="email" id="editEmail" class="form-control"></div>
-        <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-          <div><label>วันเดือนปีเกิด</label><input type="text" id="editDob" class="form-control"></div>
-          <div><label>อายุ (ปี)</label><input type="number" id="editAge" class="form-control"></div>
+  <div id="viewHistoryModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+      <div class="modal-title" style="color:#3B82F6;">ประวัติการรักษา: <span id="viewHistName"></span> (HN: <span id="viewHistHN"></span>)</div>
+      
+      <div class="history-toolbar">
+        <div>
+          <label style="font-size:0.9rem; font-weight:500;">เรียงลำดับ: </label>
+          <select id="sortOrder" class="form-control" style="width:auto; display:inline-block; padding:0.2rem 0.5rem;" onchange="renderHistoryList()">
+            <option value="desc">ใหม่ล่าสุดก่อน</option>
+            <option value="asc">เก่าสุดก่อน</option>
+          </select>
         </div>
-        <div class="form-group"><label>อาการป่วยเบื้องต้น</label><textarea id="editSymptoms" class="form-control" rows="2"></textarea></div>
-        <div class="form-group" style="background: #F5F3FF; padding: 1rem; border-radius: 0.5rem; border: 1px solid #DDD6FE;">
-          <label style="color: #7C3AED;">คำวินิจฉัยโรคเบื้องต้น</label><textarea id="editDiagnosis" class="form-control" rows="2"></textarea>
-        </div>
-        <div class="form-group"><label>วันนัดครั้งถัดไป</label><input type="text" id="editNextAppointment" class="form-control"></div>
-        <div class="modal-actions">
-          <button type="button" id="cancelBtn" class="btn-cancel">ยกเลิก</button>
-          <button type="submit" id="saveBtn" class="btn-save">อัปเดตข้อมูล</button>
-        </div>
-      </form>
+        <button class="btn-add-history" onclick="openHistoryFormFromView()">+ เพิ่มประวัติการรักษาใหม่</button>
+      </div>
+
+      <div id="historyLoading" style="text-align:center; color:#3B82F6; margin:1rem 0; display:none;">กำลังดึงข้อมูลประวัติ...</div>
+      
+      <div id="historyContainer"></div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="document.getElementById('viewHistoryModal').classList.remove('show')">ปิดหน้าต่าง</button>
+      </div>
     </div>
   </div>
 
@@ -116,36 +106,13 @@
       <div class="modal-title" style="color:#10B981;">เพิ่มประวัติการรักษา</div>
       <form id="historyForm">
         <div class="form-group" style="display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;">
-          <div>
-            <label>รหัส HN</label>
-            <input type="text" id="histHN" class="form-control" readonly>
-          </div>
-          <div>
-            <label>ชื่อผู้ป่วย</label>
-            <input type="text" id="histName" class="form-control" readonly>
-          </div>
+          <div><label>รหัส HN</label><input type="text" id="histHN" class="form-control" readonly></div>
+          <div><label>ชื่อผู้ป่วย</label><input type="text" id="histName" class="form-control" readonly></div>
         </div>
-
-        <div class="form-group">
-          <label>แพทย์ผู้รักษา</label>
-          <input type="text" id="histDoctor" class="form-control" required placeholder="ระบุชื่อแพทย์">
-        </div>
-        
-        <div class="form-group">
-          <label>อาการ (ไม่บังคับ)</label>
-          <textarea id="histSymptoms" class="form-control" rows="2" placeholder="อาการที่มาพบแพทย์วันนี้..."></textarea>
-        </div>
-        
-        <div class="form-group">
-          <label>คำวินิจฉัยแพทย์</label>
-          <textarea id="histDiagnosis" class="form-control" rows="2" required placeholder="ระบุโรคหรือผลการตรวจ..."></textarea>
-        </div>
-        
-        <div class="form-group">
-          <label>ยาที่จ่าย</label>
-          <textarea id="histMedicine" class="form-control" rows="2" required placeholder="รายการยาและวิธีทาน..."></textarea>
-        </div>
-
+        <div class="form-group"><label>แพทย์ผู้รักษา</label><input type="text" id="histDoctor" class="form-control" required></div>
+        <div class="form-group"><label>อาการ</label><textarea id="histSymptoms" class="form-control" rows="2"></textarea></div>
+        <div class="form-group"><label>คำวินิจฉัยแพทย์</label><textarea id="histDiagnosis" class="form-control" rows="2" required></textarea></div>
+        <div class="form-group"><label>ยาที่จ่าย</label><textarea id="histMedicine" class="form-control" rows="2" required></textarea></div>
         <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div>
             <label>สิทธิ์ที่เบิกจ่าย</label>
@@ -157,182 +124,190 @@
               <option value="อื่นๆ">อื่นๆ</option>
             </select>
           </div>
-          <div>
-            <label>ราคา ค่ารักษา (บาท)</label>
-            <input type="number" id="histCost" class="form-control" required placeholder="0">
-          </div>
+          <div><label>ราคา ค่ารักษา (บาท)</label><input type="number" id="histCost" class="form-control" required></div>
         </div>
-
         <div class="modal-actions">
-          <button type="button" id="histCancelBtn" class="btn-cancel">ยกเลิก</button>
-          <button type="submit" id="histSaveBtn" class="btn-save-history">บันทึกประวัติลงตาราง</button>
+          <button type="button" class="btn-cancel" onclick="document.getElementById('historyModal').classList.remove('show')">ยกเลิก</button>
+          <button type="submit" id="histSaveBtn" class="btn-save" style="background:#10B981;">บันทึก</button>
         </div>
       </form>
     </div>
   </div>
 
+  <div id="editModal" class="modal">
+    </div>
+
   <script>
-    // URL Web App จาก Google Apps Script (ตรวจสอบให้แน่ใจว่าเป็นของใหม่หลัง Deploy)
-    const ACTION_URL = "https://script.google.com/macros/s/AKfycbwbawdWUfDBBsT0mZOTKPQIiJw1y3yZq13bgOaayT-ksvldF2f3hMb7mJpK25Byah7SJw/exec";
+    // URL Web App
+    const ACTION_URL = "https://script.google.com/macros/s/AKfycbxIw1ysf4VyvMwO2G5saq9KA91d-cZtGcV6NNIVD115D39l_RkbaAFAAEk9W9nQM79r/exec";
     
     let globalPatientsData = [];
+    let currentHistoryData = []; // เก็บประวัติการรักษาที่ดึงมา
+    let activePatientIndex = -1; // จำว่ากำลังดูข้อมูลใครอยู่
 
     const searchInput = document.getElementById('searchInput');
-    const searchBtn   = document.getElementById('searchBtn');
-    const loading     = document.getElementById('loading');
     const resultsGrid = document.getElementById('resultsGrid');
 
-    // ส่วนของหน้าต่างประวัติการรักษา
-    const historyModal  = document.getElementById('historyModal');
-    const historyForm   = document.getElementById('historyForm');
-    const histCancelBtn = document.getElementById('histCancelBtn');
-
+    // ค้นหาผู้ป่วย
     async function performSearch() {
       const query = searchInput.value.trim();
-      loading.style.display = 'block';
+      document.getElementById('loading').style.display = 'block';
       resultsGrid.innerHTML = '';
       try {
         const response = await fetch(`${ACTION_URL}?action=search&q=${encodeURIComponent(query)}`);
         const result = await response.json();
-        loading.style.display = 'none';
+        document.getElementById('loading').style.display = 'none';
         if (result.status === 'success') {
           globalPatientsData = result.data;
           renderPatients(globalPatientsData);
-        } else {
-          resultsGrid.innerHTML = `<div class="empty-state" style="color:red;">ข้อผิดพลาด: ${result.message}</div>`;
         }
-      } catch (error) {
-        loading.style.display = 'none';
-        resultsGrid.innerHTML = `<div class="empty-state" style="color:red;">ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้</div>`;
-      }
+      } catch (error) { document.getElementById('loading').style.display = 'none'; }
     }
 
+    // สร้างการ์ดผู้ป่วย
     function renderPatients(patients) {
       resultsGrid.innerHTML = '';
-      if (patients.length === 0) {
-        resultsGrid.innerHTML = `<div class="empty-state">❌ ไม่พบข้อมูลผู้ป่วยที่ตรงเงื่อนไข</div>`;
-        return;
-      }
+      if (patients.length === 0) return resultsGrid.innerHTML = `<div style="text-align:center; padding:2rem;">ไม่พบข้อมูล</div>`;
+      
       patients.forEach((p, index) => {
         const card = document.createElement('div');
         card.className = 'patient-card';
-        const imgTag = p.imageUrl 
-          ? `<img src="${p.imageUrl}" class="patient-img" alt="Photo">`
-          : `<div style="width:90px; height:120px; background:#F3F4F6; display:flex; align-items:center; text-align:center; font-size:0.75rem; color:#9CA3AF; border-radius:0.5rem;">ไม่มีรูป</div>`;
-
         card.innerHTML = `
           <div class="card-header">
-            <span class="member-id">HN: ${p.memberId}</span>
-            <span class="reg-date">ลงทะเบียน: ${p.regDate}</span>
+            <span class="member-id">HN: ${p.memberId}</span><span class="reg-date">ลงทะเบียน: ${p.regDate}</span>
           </div>
           <div class="card-body">
-            ${imgTag}
+            <div style="width:90px; height:120px; background:#E5E7EB; border-radius:0.5rem; overflow:hidden;">
+              ${p.imageUrl ? `<img src="${p.imageUrl}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="text-align:center; margin-top:50px; font-size:0.8rem;">ไม่มีรูป</div>`}
+            </div>
             <div class="patient-info">
-              <div class="patient-name" onclick="openEditForm(${index})">${p.name}</div>
-              <div><span class="info-label">โทร:</span> ${p.phone}</div>
-              <div><span class="info-label">อาการเบื้องต้น:</span> ${p.symptoms}</div>
+              <div class="patient-name">${p.name}</div>
+              <div>เบอร์โทร: ${p.phone}</div>
+              <div style="color:#6B7280; font-size:0.85rem;">อาการเบื้องต้น: ${p.symptoms}</div>
             </div>
           </div>
           <div class="card-footer">
-            <button class="btn-add-history" onclick="openHistoryForm(${index})">
-              + เพิ่มประวัติรักษา
-            </button>
-            <span class="status-badge" style="font-size:0.8rem; color:#6B7280;">นัดถัดไป: <b>${p.nextAppointment}</b></span>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn-view-history" onclick="viewHistory(${index})">ดูประวัติ</button>
+              <button class="btn-add-history" onclick="openHistoryForm(${index})">+ เพิ่มประวัติ</button>
+            </div>
+            <span style="font-size:0.8rem;">นัดถัดไป: <b>${p.nextAppointment}</b></span>
           </div>
         `;
         resultsGrid.appendChild(card);
       });
     }
 
-    // เปิดหน้าต่างแก้ไขข้อมูล (เหมือนเดิม)
-    window.openEditForm = function(index) {
-      const patient = globalPatientsData[index];
-      document.getElementById('modalHN').textContent = "HN: " + patient.memberId;
-      document.getElementById('editMemberId').value = patient.memberId;
-      document.getElementById('editName').value = patient.name;
-      document.getElementById('editPhone').value = patient.phone;
-      document.getElementById('editEmail').value = patient.email;
-      document.getElementById('editDob').value = patient.dob;
-      document.getElementById('editAge').value = patient.age;
-      document.getElementById('editSymptoms').value = patient.symptoms;
-      document.getElementById('editDiagnosis').value = patient.diagnosis === "-" ? "" : patient.diagnosis;
-      document.getElementById('editNextAppointment').value = patient.nextAppointment === "-" ? "" : patient.nextAppointment;
-      document.getElementById('editModal').classList.add('show');
-    };
-    document.getElementById('cancelBtn').addEventListener('click', () => document.getElementById('editModal').classList.remove('show'));
+    // ฟังก์ชันแปลงวันที่ DD/MM/YYYY HH:MM:SS ให้เป็น Date object ไว้สำหรับ Sort
+    function parseCustomDate(dateStr) {
+      if (!dateStr) return 0;
+      const parts = dateStr.split(' ');
+      const dateParts = parts[0].split('/');
+      const timeParts = (parts[1] || '00:00:00').split(':');
+      // new Date(year, monthIndex, day, hours, minutes, seconds)
+      return new Date(dateParts[2], dateParts[1] - 1, dateParts[0], timeParts[0], timeParts[1], timeParts[2]).getTime();
+    }
 
-    // เปิดหน้าต่างบันทึกประวัติการรักษา
-    window.openHistoryForm = function(index) {
+    // 1. เปิดหน้าต่างดูประวัติ
+    async function viewHistory(index) {
+      activePatientIndex = index;
       const patient = globalPatientsData[index];
-      historyForm.reset(); // ล้างฟอร์มเก่า
       
-      // ดึงรหัสและชื่อมาแสดง (ห้ามแก้ไข)
+      document.getElementById('viewHistHN').textContent = patient.memberId;
+      document.getElementById('viewHistName').textContent = patient.name;
+      document.getElementById('historyContainer').innerHTML = '';
+      document.getElementById('historyLoading').style.display = 'block';
+      document.getElementById('viewHistoryModal').classList.add('show');
+
+      try {
+        const response = await fetch(`${ACTION_URL}?action=get_history&hn=${encodeURIComponent(patient.memberId)}`);
+        const result = await response.json();
+        if (result.status === 'success') {
+          currentHistoryData = result.data;
+          renderHistoryList(); // วาดประวัติลงจอ
+        }
+      } catch (err) {
+        document.getElementById('historyContainer').innerHTML = '<div style="color:red;">โหลดข้อมูลล้มเหลว</div>';
+      } finally {
+        document.getElementById('historyLoading').style.display = 'none';
+      }
+    }
+
+    // 2. วาดรายการประวัติ และจัดการ Sort
+    function renderHistoryList() {
+      const container = document.getElementById('historyContainer');
+      const sortOrder = document.getElementById('sortOrder').value;
+
+      if (currentHistoryData.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:2rem; color:#6B7280; background:#F9FAFB; border-radius:0.5rem;">ยังไม่มีประวัติการรักษา</div>';
+        return;
+      }
+
+      // ทำการจัดเรียง (Sort) ตามการเลือก
+      const sortedData = [...currentHistoryData].sort((a, b) => {
+        const timeA = parseCustomDate(a.date);
+        const timeB = parseCustomDate(b.date);
+        return sortOrder === 'desc' ? timeB - timeA : timeA - timeB;
+      });
+
+      container.innerHTML = '';
+      sortedData.forEach(h => {
+        container.innerHTML += `
+          <div class="history-card">
+            <div class="history-date">
+              <span>วันที่รักษา: ${h.date}</span>
+              <span style="font-size:0.85rem; color:#6B7280;">แพทย์: ${h.doctor}</span>
+            </div>
+            <div class="history-item"><b style="color:#374151;">อาการ:</b> ${h.symptoms || '-'}</div>
+            <div class="history-item"><b style="color:#7C3AED;">คำวินิจฉัย:</b> ${h.diagnosis}</div>
+            <div class="history-item"><b style="color:#10B981;">ยาที่จ่าย:</b> ${h.medicine}</div>
+            <div class="history-item" style="margin-top:0.5rem; font-size:0.85rem; border-top:1px dashed #E5E7EB; padding-top:0.5rem;">
+              สิทธิ์: ${h.right} | ค่ารักษา: ${h.cost} บาท
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // 3. เปิดฟอร์มเพิ่มประวัติ (กดจากการ์ดผู้ป่วย)
+    window.openHistoryForm = function(index) {
+      activePatientIndex = index;
+      const patient = globalPatientsData[index];
+      document.getElementById('historyForm').reset();
       document.getElementById('histHN').value = patient.memberId;
       document.getElementById('histName').value = patient.name;
-      
-      historyModal.classList.add('show');
+      document.getElementById('historyModal').classList.add('show');
     };
-    histCancelBtn.addEventListener('click', () => historyModal.classList.remove('show'));
 
-    // ซับมิตฟอร์มประวัติการรักษา
-    historyForm.addEventListener('submit', async function(e) {
+    // 4. เปิดฟอร์มเพิ่มประวัติ (กดจากในหน้าต่างดูประวัติ)
+    window.openHistoryFormFromView = function() {
+      document.getElementById('viewHistoryModal').classList.remove('show');
+      openHistoryForm(activePatientIndex);
+    };
+
+    // 5. บันทึกประวัติการรักษา
+    document.getElementById('historyForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const saveBtn = document.getElementById('histSaveBtn');
-      saveBtn.disabled = true;
-      saveBtn.textContent = 'กำลังบันทึก...';
+      saveBtn.disabled = true; saveBtn.textContent = 'กำลังบันทึก...';
 
       const params = new URLSearchParams();
       params.append('action', 'add_history');
-      params.append('hn', document.getElementById('histHN').value);
-      params.append('name', document.getElementById('histName').value);
-      params.append('doctor', document.getElementById('histDoctor').value);
-      params.append('symptoms', document.getElementById('histSymptoms').value);
-      params.append('diagnosis', document.getElementById('histDiagnosis').value);
-      params.append('medicine', document.getElementById('histMedicine').value);
-      params.append('right', document.getElementById('histRight').value);
-      params.append('cost', document.getElementById('histCost').value);
-
-      try {
-        const response = await fetch(ACTION_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: params.toString()
-        });
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          alert('บันทึกประวัติการรักษาเรียบร้อยแล้ว');
-          historyModal.classList.remove('show');
-        } else {
-          alert('เกิดข้อผิดพลาด: ' + result.message);
-        }
-      } catch (err) {
-        alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = 'บันทึกประวัติลงตาราง';
-      }
-    });
-
-    // ซับมิตฟอร์มแก้ไข (ของเดิม)
-    document.getElementById('editForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const saveBtn = document.getElementById('saveBtn');
-      saveBtn.disabled = true; saveBtn.textContent = 'กำลังบันทึก...';
-      const params = new URLSearchParams();
-      params.append('action', 'update');
-      ['editMemberId','editName','editPhone','editEmail','editDob','editAge','editSymptoms','editDiagnosis','editNextAppointment'].forEach(id => {
-        params.append(id.replace('edit','').charAt(0).toLowerCase() + id.replace('edit','').slice(1), document.getElementById(id).value);
+      ['histHN','histName','histDoctor','histSymptoms','histDiagnosis','histMedicine','histRight','histCost'].forEach(id => {
+        params.append(id.replace('hist','').toLowerCase(), document.getElementById(id).value);
       });
+
       try {
-        await fetch(ACTION_URL, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: params.toString() });
-        document.getElementById('editModal').classList.remove('show');
-        performSearch();
-      } catch (err) {} 
-      saveBtn.disabled = false; saveBtn.textContent = 'อัปเดตข้อมูล';
+        await fetch(ACTION_URL, { method: 'POST', body: params.toString() });
+        alert('บันทึกประวัติสำเร็จ');
+        document.getElementById('historyModal').classList.remove('show');
+        // เปิดหน้าต่างดูประวัติซ้ำ เพื่อดูข้อมูลที่เพิ่งอัปเดตไปสดๆ
+        viewHistory(activePatientIndex);
+      } catch (err) { alert('ข้อผิดพลาดเซิร์ฟเวอร์'); } 
+      finally { saveBtn.disabled = false; saveBtn.textContent = 'บันทึก'; }
     });
 
-    searchBtn.addEventListener('click', performSearch);
+    document.getElementById('searchBtn').addEventListener('click', performSearch);
     searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(); });
   </script>
 </body>
