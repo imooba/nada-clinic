@@ -285,7 +285,7 @@
       openHistoryForm(activePatientIndex);
     };
 
-    // 5. บันทึกประวัติการรักษา
+// 5. บันทึกประวัติการรักษา
     document.getElementById('historyForm').addEventListener('submit', async function(e) {
       e.preventDefault();
       const saveBtn = document.getElementById('histSaveBtn');
@@ -298,13 +298,23 @@
       });
 
       try {
-        await fetch(ACTION_URL, { method: 'POST', body: params.toString() });
+        // --- จุดที่แก้ไข: เพิ่ม headers เข้าไปที่นี่ ---
+        await fetch(ACTION_URL, { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params.toString() 
+        });
+        
         alert('บันทึกประวัติสำเร็จ');
         document.getElementById('historyModal').classList.remove('show');
+        
         // เปิดหน้าต่างดูประวัติซ้ำ เพื่อดูข้อมูลที่เพิ่งอัปเดตไปสดๆ
         viewHistory(activePatientIndex);
-      } catch (err) { alert('ข้อผิดพลาดเซิร์ฟเวอร์'); } 
-      finally { saveBtn.disabled = false; saveBtn.textContent = 'บันทึก'; }
+      } catch (err) { 
+        alert('ข้อผิดพลาดเซิร์ฟเวอร์'); 
+      } finally { 
+        saveBtn.disabled = false; saveBtn.textContent = 'บันทึก'; 
+      }
     });
 
     document.getElementById('searchBtn').addEventListener('click', performSearch);
