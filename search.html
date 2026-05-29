@@ -361,6 +361,54 @@
 
     document.getElementById('searchBtn').addEventListener('click', performSearch);
     searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(); });
+
+    // -----------------------------------------------------------------
+    // ซับมิตฟอร์ม : สำหรับบันทึกการ "แก้ไขข้อมูลส่วนตัว" 
+    // -----------------------------------------------------------------
+    document.getElementById('editForm').addEventListener('submit', async function(e) {
+      e.preventDefault(); // ป้องกันไม่ให้หน้าเว็บรีโหลดตัวเอง
+      
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true; 
+      saveBtn.textContent = 'กำลังบันทึก...';
+
+      // ดึงข้อมูลทั้งหมดจากหน้าต่างป๊อปอัปแก้ไข
+      const params = new URLSearchParams();
+      params.append('action', 'update');
+      params.append('memberId', document.getElementById('editMemberId').value);
+      params.append('name', document.getElementById('editName').value.trim());
+      params.append('phone', document.getElementById('editPhone').value.trim());
+      params.append('email', document.getElementById('editEmail').value.trim());
+      params.append('dob', document.getElementById('editDob').value.trim());
+      params.append('age', document.getElementById('editAge').value);
+      params.append('symptoms', document.getElementById('editSymptoms').value.trim());
+      params.append('diagnosis', document.getElementById('editDiagnosis').value.trim());
+      params.append('nextAppointment', document.getElementById('editNextAppointment').value.trim());
+
+      try {
+        const response = await fetch(ACTION_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: params.toString()
+        });
+        
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          alert('บันทึกการแก้ไขข้อมูลผู้ป่วยสำเร็จ!');
+          document.getElementById('editModal').classList.remove('show');
+          performSearch(); // โหลดข้อมูลใหม่มาแสดงบนหน้าจอทันที
+        } else {
+          alert('เกิดข้อผิดพลาดจากระบบ: ' + result.message);
+        }
+      } catch (err) {
+        alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบ URL หรืออินเทอร์เน็ต');
+        console.error(err);
+      } finally {
+        saveBtn.disabled = false; 
+        saveBtn.textContent = 'อัปเดตข้อมูล';
+      }
+    });
   </script>
 </body>
 </html>
