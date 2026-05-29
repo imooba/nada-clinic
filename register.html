@@ -11,10 +11,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ณดาคลีนิค — ลงทะเบียนผู้รับบริการ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet" />
   
   <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Sarabun', sans-serif; background-color: #F9FAFB; color: #1F2937; padding: 2rem 1rem; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 2.5rem; }
+    header h1 { font-size: 2rem; color: #2E1065; margin-bottom: 0.5rem; }
 
   :root {
     --purple-50:  #F5F3FF;
@@ -40,15 +44,6 @@
     --radius-xl:  28px;
   }
 
-  html, body {
-    font-family: 'Sarabun', sans-serif;
-    background-color: var(--gray-100);
-    color: var(--gray-800);
-    line-height: 1.5;
-    padding: 2rem 1rem; /* เพิ่ม padding ตรงนี้ไม่ให้ฟอร์มชิดขอบจอเกินไป */
-    min-height: 100vh;
-  }
-
   /* ─── Background decoration ─── */
   body::before {
     content: '';
@@ -71,15 +66,6 @@
     z-index: 0;
   }
     
-  .container {
-    width: 100%;
-    max-width: 900px; /* ขยายจากเดิม (น่าจะ 500-600px) เป็น 900px */
-    margin: 0 auto;
-    background-color: var(--white);
-    border-radius: 1rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    padding: 3rem; /* เพิ่มพื้นที่ว่างด้านในให้ดูโปร่งขึ้น */
-  }
   /* ─── Layout ─── */
   .page-wrap {
     position: relative; z-index: 1;
