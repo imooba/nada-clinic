@@ -150,7 +150,10 @@
         <div class="form-group" style="background: #F5F3FF; padding: 1rem; border-radius: 0.5rem; border: 1px solid #DDD6FE;">
           <label style="color: #7C3AED;">คำวินิจฉัยโรคเบื้องต้น</label><textarea id="editDiagnosis" class="form-control" rows="2"></textarea>
         </div>
-        <div class="form-group"><label>วันนัดครั้งถัดไป</label><input type="text" id="editNextAppointment" class="form-control"></div>
+        <div class="form-group">
+          <label>วันนัดครั้งถัดไป (เลือกวันที่และเวลา)</label>
+          <input type="datetime-local" id="editNextAppointment" class="form-control">
+        </div>
         <div class="modal-actions">
           <button type="button" id="cancelBtn" class="btn-cancel" onclick="document.getElementById('editModal').classList.remove('show')">ยกเลิก</button>
           <button type="submit" id="saveBtn" class="btn-save">อัปเดตข้อมูล</button>
@@ -235,7 +238,18 @@
       document.getElementById('editAge').value = patient.age;
       document.getElementById('editSymptoms').value = patient.symptoms;
       document.getElementById('editDiagnosis').value = patient.diagnosis === "-" ? "" : patient.diagnosis;
-      document.getElementById('editNextAppointment').value = patient.nextAppointment === "-" ? "" : patient.nextAppointment;
+      let nextAppVal = "";
+      if (patient.nextAppointment && patient.nextAppointment !== "-") {
+        let parts = patient.nextAppointment.trim().split(" ");
+        if (parts.length === 2) {
+          let dParts = parts[0].split("/"); // คาดหวัง [dd, mm, yyyy]
+          if (dParts.length === 3) {
+            // แปลงเป็น yyyy-mm-ddThh:mm เพื่อให้ปฏิทินแสดงผลได้ถูกต้อง
+            nextAppVal = `${dParts[2]}-${dParts[1]}-${dParts[0]}T${parts[1]}`;
+          }
+        }
+      }
+      document.getElementById('editNextAppointment').value = nextAppVal;
 
       document.getElementById('editModal').classList.add('show');
     };
@@ -383,7 +397,19 @@
       params.append('age', document.getElementById('editAge').value);
       params.append('symptoms', document.getElementById('editSymptoms').value.trim());
       params.append('diagnosis', document.getElementById('editDiagnosis').value.trim());
-      params.append('nextAppointment', document.getElementById('editNextAppointment').value.trim());
+
+      let rawDate = document.getElementById('editNextAppointment').value;
+      let formattedNextApp = "";
+      if (rawDate) {
+        let d = new Date(rawDate);
+        let day = String(d.getDate()).padStart(2, '0');
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+        let year = d.getFullYear();
+        let hours = String(d.getHours()).padStart(2, '0');
+        let minutes = String(d.getMinutes()).padStart(2, '0');
+        formattedNextApp = `${day}/${month}/${year} ${hours}:${minutes}`;
+      }
+      params.append('nextAppointment', formattedNextApp);
 
       try {
         const response = await fetch(ACTION_URL, {
