@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
+  <script>
+    // ตรวจสอบสิทธิ์ ถ้าไม่ได้ล็อกอินให้เด้งกลับหน้าแรก
+    if (localStorage.getItem('nada_logged_in') !== 'true') {
+      window.location.replace('index.html');
+    }
+  </script>
+<header style="position: relative;">
+      <a href="index.html" style="position: absolute; left: 0; top: 0; text-decoration: none; color: #7C3AED; font-weight: 500;">&larr; กลับเมนูหลัก</a>
+      <h1>ณดาคลีนิค — ค้นหาและประวัติการรักษา</h1>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ณดาคลีนิค — ค้นหาและประวัติการรักษา</title>
