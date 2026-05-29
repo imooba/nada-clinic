@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="th">
+<header>
 <script>
     // ตรวจสอบสิทธิ์ ถ้าไม่ได้ล็อกอินให้เด้งกลับหน้าแรก
     if (localStorage.getItem('nada_logged_in') !== 'true') {
       window.location.replace('index.html');
     }
-  </script>
-<header style="position: relative;">
-      <a href="index.html" style="position: absolute; left: 0; top: 0; text-decoration: none; color: #7C3AED; font-weight: 500;">&larr; กลับเมนูหลัก</a>
-      <h1>ณดาคลีนิค — ลงทะเบียนผู้รับบริการ</h1>
-</header>
+</script>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ณดาคลีนิค — ลงทะเบียนผู้รับบริการ</title>
@@ -369,6 +366,15 @@
 </style>
 </head>
 <body>
+<div class="container">
+    <header style="position: relative; text-align: center; margin-bottom: 2.5rem;">
+      <a href="index.html" style="position: absolute; left: 0; top: 0; text-decoration: none; color: #7C3AED; font-weight: 500;">
+        🏠 กลับเมนูหลัก
+      </a>
+      <h1 style="font-size: 2rem; color: #2E1065; margin-bottom: 0.5rem;">ณดาคลีนิค — ลงทะเบียน</h1>
+    </header>
+
+</div>
 <div class="page-wrap">
 
   <header>
