@@ -18,7 +18,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Sarabun', sans-serif; background-color: #F9FAFB; color: #1F2937; padding: 2rem 1rem; }
     .container { max-width: 1000px; margin: 0 auto; }
-    header { text-align: center; margin-bottom: 2.5rem; }
+    header { text-align: left; margin-bottom: 2.5rem; }
     header h1 { font-size: 2rem; color: #2E1065; margin-bottom: 0.5rem; }
     .search-box { background: #ffffff; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: flex; gap: 1rem; margin-bottom: 2rem; }
     .search-input-wrapper { flex: 1; }
@@ -200,13 +200,22 @@
       } catch (error) { document.getElementById('loading').style.display = 'none'; }
     }
 
-    // สร้างการ์ดผู้ป่วย
 // สร้างการ์ดผู้ป่วย
     function renderPatients(patients) {
       resultsGrid.innerHTML = '';
       if (patients.length === 0) return resultsGrid.innerHTML = `<div style="text-align:center; padding:2rem;">ไม่พบข้อมูล</div>`;
       
       patients.forEach((p, index) => {
+        
+        // ---------------------------------------------------------
+        // 🌟 โค้ดที่เพิ่มใหม่: แปลง URL ของ Google Drive ให้แสดงรูปได้
+        // ---------------------------------------------------------
+        let displayImg = p.imageUrl;
+        if (displayImg && displayImg.includes("uc?id=")) {
+          // เปลี่ยน uc?id= เป็น thumbnail?id= และกำหนดขนาดรูปเป็นกว้าง 500px
+          displayImg = displayImg.replace("uc?id=", "thumbnail?id=") + "&sz=w500";
+        }
+        
         const card = document.createElement('div');
         card.className = 'patient-card';
         card.innerHTML = `
@@ -215,7 +224,7 @@
           </div>
           <div class="card-body">
             <div style="width:90px; height:120px; background:#E5E7EB; border-radius:0.5rem; overflow:hidden;">
-              ${p.imageUrl ? `<img src="${p.imageUrl}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="text-align:center; margin-top:50px; font-size:0.8rem;">ไม่มีรูป</div>`}
+              ${displayImg ? `<img src="${displayImg}" style="width:100%; height:100%; object-fit:cover;">` : `<div style="text-align:center; margin-top:50px; font-size:0.8rem;">ไม่มีรูป</div>`}
             </div>
             <div class="patient-info">
               <div class="patient-name" onclick="openEditForm(${index})">${p.name}</div>
