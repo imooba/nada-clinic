@@ -130,12 +130,20 @@ function doPost(e) {
         sheet.getRange(rowIndex, 12).setValue(p.diagnosis);
         sheet.getRange(rowIndex, 13).setValue(p.nextAppointment);
 
+        // --- ส่วนที่ต้องเพิ่มใหม่ (บันทึกคอลัมน์ 14 - 19) ---
+        sheet.getRange(rowIndex, 14).setValue(p.idCard || "");
+        sheet.getRange(rowIndex, 15).setValue(p.address || "");
+        sheet.getRange(rowIndex, 16).setValue(p.udHospital || "");
+        sheet.getRange(rowIndex, 17).setValue(p.udMedicine || "");
+        sheet.getRange(rowIndex, 18).setValue(p.allergy || "");
+        sheet.getRange(rowIndex, 19).setValue(p.otherNotes || "")
+        // ------------------------------------------
+
         return buildResponse({ status: "success", message: "อัปเดตข้อมูลผู้ป่วยสำเร็จ" });
       } else {
         return buildResponse({ status: "error", message: "ไม่พบหมายเลขสมาชิกนี้ในระบบ" });
       }
     }
-
     // ==========================================
     // 3. ฟีเจอร์เดิม: ลงทะเบียนคนใหม่
     // ==========================================
@@ -145,15 +153,25 @@ function doPost(e) {
     const dob      = p.dob      || "";
     const age      = p.age      || "";
     const symptoms = p.symptoms || "";
+    
+    // --- รับตัวแปรใหม่ที่ส่งมาจากหน้าเว็บ ---
+    const idCard     = p.idCard     || "";
+    const address    = p.address    || "";
+    const udHospital = p.udHospital || "";
+    const udMedicine = p.udMedicine || "";
+    const allergy    = p.allergy    || "";
+    const otherNotes = p.otherNotes || "";
 
     const ss    = SpreadsheetApp.openById(SHEET_ID);
     const sheet = ss.getSheetByName(SHEET_NAME);
 
+    // หากยังไม่มีข้อมูลเลย ให้สร้าง Header ใหม่ครอบคลุมช่องใหม่ทั้งหมด
     if (sheet.getLastRow() === 0) {
       const headers = [
         "ลำดับ", "หมายเลขสมาชิก", "วันที่ลงทะเบียน", "ชื่อ", "Email",
         "เบอร์โทรศัพท์", "วันเดือนปีเกิด", "อายุ (ปี)",
-        "อาการป่วย", "URL รูปภาพ", "URL เอกสาร PDF", "คำวินิจฉัยโรค", "วันนัดครั้งถัดไป"
+        "อาการป่วย", "URL รูปภาพ", "URL เอกสาร PDF", "คำวินิจฉัยโรค", "วันนัดครั้งถัดไป",
+        "เลขบัตรประชาชน", "ที่อยู่", "โรคประจำตัวรับยาที่", "ยาโรคประจำตัว", "ประวัติแพ้ยา/อาหาร", "อื่นๆ"
       ];
       sheet.appendRow(headers);
       sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#7C3AED").setFontColor("#ffffff");
@@ -199,10 +217,14 @@ function doPost(e) {
     const seq     = sheet.getLastRow();
     const dateStr = Utilities.formatDate(new Date(), "Asia/Bangkok", "dd/MM/yyyy HH:mm:ss");
     
-    sheet.appendRow([seq, nextMemberId, dateStr, name, email, phone, dob, age, symptoms, imageUrl, pdfUrl, "", ""]);
+    // บันทึกข้อมูลเรียงตาม Header (เว้นช่อง 11,12 ไว้ให้ คำวินิจฉัย กับ วันนัด เหมือนเดิม ส่วนข้อมูลใหม่ไปต่อท้าย)
+    sheet.appendRow([
+      seq, nextMemberId, dateStr, name, email, phone, dob, age, symptoms, 
+      imageUrl, pdfUrl, "", "", 
+      idCard, address, udHospital, udMedicine, allergy, otherNotes
+    ]);
 
     return buildResponse({ status: "success", memberId: nextMemberId, message: "บันทึกข้อมูลสำเร็จ" });
-
   } catch (err) {
     return buildResponse({ status: "error", message: err.toString() });
   }
@@ -273,7 +295,10 @@ function doGet(e) {
             seq: row[0], memberId: row[1], regDate: row[2], name: row[3],
             email: row[4], phone: row[5], dob: row[6], age: row[7],
             symptoms: row[8], imageUrl: row[9], pdfUrl: row[10],
-            diagnosis: row[11] || "-", nextAppointment: row[12] || "-"
+            diagnosis: row[11] || "-", nextAppointment: row[12] || "-",
+            idCard: row[13] || "", address: row[14] || "",
+            udHospital: row[15] || "", udMedicine: row[16] || "",
+            allergy: row[17] || "", otherNotes: row[18] || ""
           });
         }
       }
