@@ -49,7 +49,7 @@
     /* โมดอล */
     .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; padding: 1rem; }
     .modal.show { display: flex; }
-    .modal-content { background: #ffffff; width: 100%; max-width: 650px; border-radius: 1rem; padding: 2rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
+    .modal-content { background: #ffffff; width: 100%; max-width: 1000px; border-radius: 1rem; padding: 2rem; box-shadow: 0 10px 10px -5px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
     .modal-title { font-size: 1.3rem; margin-bottom: 1rem; border-bottom: 2px solid #F3F4F6; padding-bottom: 0.5rem; font-weight: 600; }
     
     /* สไตล์สำหรับประวัติการรักษา */
@@ -121,18 +121,73 @@
           <div><label>ชื่อผู้ป่วย</label><input type="text" id="histName" class="form-control" readonly></div>
         </div>
         <div class="form-group"><label>แพทย์ผู้รักษา *</label><input type="text" id="histDoctor" class="form-control" required></div>
-        <div class="form-group"><label>อาการ</label><textarea id="histSymptoms" class="form-control" rows="2"></textarea></div>
-        <div class="form-group"><label>คำวินิจฉัยแพทย์ *</label><textarea id="histDiagnosis" class="form-control" rows="2" required></textarea></div>
-        <div class="form-group"><label>ยาที่จ่าย *</label><textarea id="histMedicine" class="form-control" rows="2" required></textarea></div>
+        <div class="form-group"><label>อาการเจ็บป่วย</label><textarea id="histSymptoms" class="form-control" rows="2"></textarea></div>
+        <div class="form-group"><label>คำวินิจฉัยโรค *</label><textarea id="histMedicine" class="form-control" rows="2" required></textarea></div>
+        <div class="form-group">
+          <label>การรักษา / จ่ายยา (เลือกได้มากกว่า 1 ข้อ)</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; background: #F9FAFB; padding: 1rem; border-radius: 0.5rem; border: 1px solid #E5E7EB; margin-top: 0.25rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="losec + d ขาว + M เหลือง +Fenac 50 ชมพู
+            </label>"> losec + d ขาว + M เหลือง +Fenac 50 ชมพู
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="losec + d ขาว + M ส้ม +Fenac 50 ชมพู"> losec + d ขาว + M ส้ม +Fenac 50 ชมพู
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="losec + d ขาว + M ส้ม + Fenac 25 ม่วง"> losec + d ขาว + M ส้ม + Fenac 25 ม่วง
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="losec + d ขาว + M ส้ม + Pirox10 เหลืองเหลี่ยม"> losec + d ขาว + M ส้ม + Pirox10 เหลืองเหลี่ยม
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="losec + d ขาว + M ส้ม +Pirox10 ม่วง"> losec + d ขาว + M ส้ม +Pirox10 ม่วง
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="losec + d ขาว + colchicine  +  Pirox 20  ชมพู"> losec + d ขาว + colchicine  +  Pirox 20  ชมพู
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="losec + d ขาว + colchicine  +  Pirox 20  แคบซุลขาวแดง"> losec + d ขาว + colchicine  +  Pirox 20  แคบซุลขาวแดง
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="คออักเสบ   rulid + dม่วง + แก้ไอเม็ดสีแดง + cpm"> คออักเสบ   rulid + dม่วง + แก้ไอเม็ดสีแดง + cpm
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="คออักเสบ Amoxy + d ม่วง+ para"> คออักเสบ Amoxy + d ม่วง+ para
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="ผื่นคัน  Famo+cpm+ยาทา TA  ตลับชมพู"> ผื่นคัน  Famo+cpm+ยาทา TA  ตลับชมพู
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="ผื่นคัน  Famo+ Atarax 10 /25  + ยาทา Cotrimazole ตลับเหลือง"> ผื่นคัน  Famo+ Atarax 10 /25  + ยาทา Cotrimazole ตลับเหลือง
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="ผื่นคัน  Famo+ Atarax 10 /25  + ยาทา  betamethasone ตลับฟ้า"> ผื่นคัน  Famo+ Atarax 10 /25  + ยาทา  betamethasone ตลับฟ้า
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="ผื่นคัน  Famo+ Atarax 10 /25  + ยาทา  clobetazole  ตลับเขียว"> ผื่นคัน  Famo+ Atarax 10 /25  + ยาทา  clobetazole  ตลับเขียว
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="ยาฉีด D"> ยาฉีด D
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" name="histTreatment" value="ยาฉีด D+T"> ยาฉีด D+T
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal;">
+              <input type="checkbox" id="histTreatmentOther" value="อื่นๆ" onchange="toggleTreatmentOther()"> อื่นๆ
+            </label>
+            <input type="text" id="histTreatmentOtherText" class="form-control" placeholder="ระบุการรักษาอื่นๆ..." style="display: none; grid-column: 1 / -1; margin-top: 0.5rem;">
+          </div>
+        </div>
         <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
           <div>
             <label>สิทธิ์ที่เบิกจ่าย</label>
             <select id="histRight" class="form-control" required>
               <option value="">-- เลือกสิทธิ์ --</option>
-              <option value="จ่ายเอง">จ่ายเอง</option>
-              <option value="สิทธิ์ 30บ.">สิทธิ์ 30บ.</option>
-              <option value="สิทธิ์ สปสช.">สิทธิ์ สปสช.</option>
-              <option value="อื่นๆ">อื่นๆ</option>
+              <option value="บัตรทอง">บัตรทอง</option>
+              <option value="เบิกได้">เบิกได้</option>
+              <option value="ประกันสังคม">ประกันสังคม</option>
+              <option value="ต่างด้าว">ต่างด้าว</option>
+              <option value="ชำระเงินเอง">ชำระเงินเอง</option>
             </select>
           </div>
           <div><label>ราคา ค่ารักษา (บาท) *</label><input type="number" id="histCost" class="form-control" required></div>
@@ -221,10 +276,22 @@
         const result = await response.json();
         document.getElementById('loading').style.display = 'none';
         if (result.status === 'success') {
-          globalPatientsData = result.data;
+          let patients = result.data;
+
+          // 🌟 เพิ่มเงื่อนไข: ถ้าไม่ได้พิมพ์คำค้นหา ให้ดึงแค่ 4 คนสุดท้าย
+          if (query === "") {
+            // .slice(-4) คือเอาข้อมูล 4 ตัวท้ายสุด
+            // .reverse() คือสลับให้ข้อมูลคนล่าสุดขึ้นมาแสดงเป็นอันดับแรกสุด
+            patients = patients.slice(-4).reverse();
+          }
+
+          globalPatientsData = patients;
           renderPatients(globalPatientsData);
         }
-      } catch (error) { document.getElementById('loading').style.display = 'none'; }
+      } catch (error) { 
+        document.getElementById('loading').style.display = 'none'; 
+        resultsGrid.innerHTML = `<div style="text-align:center; padding:2rem; color:red;">เกิดข้อผิดพลาดในการดึงข้อมูล</div>`;
+      }
     }
 
 // สร้างการ์ดผู้ป่วย
@@ -388,9 +455,9 @@
               <span>วันที่รักษา: ${h.date}</span>
               <span style="font-size:0.85rem; color:#6B7280;">แพทย์: ${h.doctor}</span>
             </div>
-            <div class="history-item"><b style="color:#374151;">อาการ:</b> ${h.symptoms || '-'}</div>
+            <div class="history-item"><b style="color:#374151;">อาการเจ็บป่วย:</b> ${h.symptoms || '-'}</div>
             <div class="history-item"><b style="color:#7C3AED;">คำวินิจฉัย:</b> ${h.diagnosis}</div>
-            <div class="history-item"><b style="color:#10B981;">ยาที่จ่าย:</b> ${h.medicine}</div>
+            <div class="history-item"><b style="color:#10B981;">การรักษา:</b> ${h.medicine}</div>
             <div class="history-item" style="margin-top:0.5rem; font-size:0.85rem; border-top:1px dashed #E5E7EB; padding-top:0.5rem;">
               สิทธิ์: ${h.right} | ค่ารักษา: ${h.cost} บาท
             </div>
@@ -403,11 +470,25 @@
       }
     }
 
+    // ฟังก์ชันซ่อน/แสดงกล่องข้อความเมื่อเลือก "อื่นๆ" ในประวัติการรักษา
+    function toggleTreatmentOther() {
+      const isChecked = document.getElementById('histTreatmentOther').checked;
+      const otherInput = document.getElementById('histTreatmentOtherText');
+      otherInput.style.display = isChecked ? 'block' : 'none';
+      if (isChecked) {
+        otherInput.focus();
+      } else {
+        otherInput.value = ''; // เคลียร์ค่าทิ้งถ้าติ๊กออก
+      }
+    }
+
     // 3. เปิดฟอร์มเพิ่มประวัติ (กดจากการ์ดผู้ป่วย)
     window.openHistoryForm = function(index) {
       activePatientIndex = index;
       const patient = globalPatientsData[index];
       document.getElementById('historyForm').reset();
+      // 🌟 เพิ่มบรรทัดนี้ เพื่อรีเซ็ตช่องอื่นๆ ให้ซ่อนไว้เสมอเมื่อเปิดฟอร์มใหม่
+      document.getElementById('histTreatmentOtherText').style.display = 'none';
       document.getElementById('histHN').value = patient.memberId;
       document.getElementById('histName').value = patient.name;
       document.getElementById('historyModal').classList.add('show');
@@ -424,30 +505,67 @@
       e.preventDefault();
       const saveBtn = document.getElementById('histSaveBtn');
       saveBtn.disabled = true; saveBtn.textContent = 'กำลังบันทึก...';
-
-      const params = new URLSearchParams();
-      params.append('action', 'add_history');
-      ['histHN','histName','histDoctor','histSymptoms','histDiagnosis','histMedicine','histRight','histCost'].forEach(id => {
-        params.append(id.replace('hist','').toLowerCase(), document.getElementById(id).value);
+      
+      // 🌟 1. ดึงค่าจาก Checkbox ที่ถูกติ๊กทั้งหมด
+      let treatments = [];
+      document.querySelectorAll('input[name="histTreatment"]:checked').forEach(cb => {
+        treatments.push(cb.value);
       });
 
+      // ถ้ามีการติ๊ก "อื่นๆ" ให้เอาข้อความที่พิมพ์มาต่อท้าย
+      if (document.getElementById('histTreatmentOther').checked) {
+        const otherText = document.getElementById('histTreatmentOtherText').value.trim();
+        if (otherText) treatments.push("อื่นๆ: " + otherText);
+      }
+
+      // ป้องกันการลืมเลือกการรักษา
+      if (treatments.length === 0) {
+        alert('กรุณาเลือกการรักษาอย่างน้อย 1 รายการ');
+        saveBtn.disabled = false; 
+        saveBtn.textContent = 'บันทึก';
+        return;
+      }
+
+
+
+
+
+      // 🌟 2. แนบข้อมูลทั้งหมดเพื่อส่งไปยัง Google Sheet
+      const params = new URLSearchParams();
+      params.append('action', 'add_history');
+      params.append('hn', document.getElementById('histHN').value);
+      params.append('name', document.getElementById('histName').value);
+      params.append('doctor', document.getElementById('histDoctor').value);
+      params.append('symptoms', document.getElementById('histSymptoms').value);
+      
+      // รวมรายการการรักษาเป็นข้อความคั่นด้วยลูกน้ำ (เช่น "นวดศีรษะ, ครอบแก้ว")
+      params.append('diagnosis', treatments.join(', ')); 
+      
+      params.append('medicine', document.getElementById('histMedicine').value);
+      params.append('right', document.getElementById('histRight').value);
+      params.append('cost', document.getElementById('histCost').value);
+
       try {
-        // --- จุดที่แก้ไข: เพิ่ม headers เข้าไปที่นี่ ---
-        await fetch(ACTION_URL, { 
-          method: 'POST', 
+        const response = await fetch(ACTION_URL, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: params.toString() 
+          body: params.toString()
         });
         
-        alert('บันทึกประวัติสำเร็จ');
-        document.getElementById('historyModal').classList.remove('show');
+        const result = await response.json();
         
-        // เปิดหน้าต่างดูประวัติซ้ำ เพื่อดูข้อมูลที่เพิ่งอัปเดตไปสดๆ
-        viewHistory(activePatientIndex);
-      } catch (err) { 
-        alert('ข้อผิดพลาดเซิร์ฟเวอร์'); 
-      } finally { 
-        saveBtn.disabled = false; saveBtn.textContent = 'บันทึก'; 
+        if (result.status === 'success') {
+          alert('บันทึกประวัติการรักษาเรียบร้อยแล้ว');
+          document.getElementById('historyModal').classList.remove('show');
+          viewHistory(activePatientIndex); // เปิดหน้าต่างดูประวัติเพื่อดูข้อมูลอัปเดตล่าสุด
+        } else {
+          alert('เกิดข้อผิดพลาด: ' + result.message);
+        }
+      } catch (err) {
+        alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'บันทึกประวัติลงตาราง';
       }
     });
 
