@@ -431,10 +431,56 @@
         <div class="err-msg" id="err-dob">กรุณาเลือกวันเดือนปีเกิด</div>
       </div>
 
-      <!-- อาการป่วย -->
+      <!-- เพิ่ม เลขบัตรประชาชน และ ที่อยู่ -->
+      <div class="field">
+        <label for="idCard">เลขบัตรประจำตัวประชาชน</label>
+        <input type="text" id="idCard" name="idCard" placeholder="กรอกเฉพาะตัวเลข 13 หลัก" autocomplete="off" maxlength="13" />
+      </div>
+
+      <div class="field">
+        <label for="address">ที่อยู่ปัจจุบัน</label>
+        <textarea id="address" name="address" placeholder="บ้านเลขที่ หมู่ ซอย ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์"></textarea>
+      </div>
+
+      <div class="divider"></div>
+      <div class="section-title">ข้อมูลสุขภาพ</div>
+
+      <!-- อาการป่วย (ของเดิมมีอยู่แล้ว เลื่อนมาไว้ตรงนี้เพื่อให้เป็นหมวดหมู่) -->
       <div class="field">
         <label for="symptoms">อาการป่วย / เหตุผลที่มาพบแพทย์</label>
         <textarea id="symptoms" name="symptoms" placeholder="ระบุอาการหรือความต้องการ เช่น ปวดหัว มีไข้ ต้องการตรวจสุขภาพ…"></textarea>
+      </div>
+
+      <!-- โรคประจำตัว และ ยา -->
+      <div class="field">
+        <label for="udHospital">โรคประจำตัวรับยาที่</label>
+        <input type="text" id="udHospital" name="udHospital" placeholder="ระบุโรงพยาบาล หรือ คลินิก (ถ้ามี)" />
+      </div>
+
+      <div class="field">
+        <label for="udMedicine">ยาโรคประจำตัว</label>
+        <input type="text" id="udMedicine" name="udMedicine" placeholder="ระบุชื่อยาที่ใช้ประจำ (ถ้ามี)" />
+      </div>
+
+      <!-- ประวัติแพ้ยา / แพ้อาหาร (พร้อม Radio Button) -->
+      <div class="field">
+        <label>ประวัติแพ้ยา / แพ้อาหาร <span class="req">*</span></label>
+        <div style="display: flex; gap: 1.5rem; margin: 8px 0;">
+          <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
+            <input type="radio" name="hasAllergy" value="no" checked onchange="toggleAllergy()"> ไม่มี
+          </label>
+          <label style="display: flex; align-items: center; gap: 5px; font-weight: normal; cursor: pointer;">
+            <input type="radio" name="hasAllergy" value="yes" onchange="toggleAllergy()"> มี
+          </label>
+        </div>
+        <input type="text" id="allergyDetail" placeholder="ระบุชื่อยา หรืออาหารที่แพ้ พร้อมอาการ..." style="display: none; margin-top: 5px;" />
+        <div class="err-msg" id="err-allergy">กรุณาระบุสิ่งที่แพ้</div>
+      </div>
+
+      <!-- อื่นๆ -->
+      <div class="field">
+        <label for="otherNotes">อื่นๆ</label>
+        <textarea id="otherNotes" name="otherNotes" placeholder="หมายเหตุเพิ่มเติม..."></textarea>
       </div>
 
       <div class="divider"></div>
@@ -682,7 +728,22 @@ function validate() {
     hideErr('err-dob');
     ['dobDay','dobMonth','dobYear'].forEach(id => document.getElementById(id).classList.remove('error'));
   }
-
+  // นำโค้ดนี้ไปวางไว้ก่อนบรรทัด return ok; ในฟังก์ชัน validate()
+  const hasAllergy = document.querySelector('input[name="hasAllergy"]:checked').value;
+  if (hasAllergy === 'yes') {
+    const detail = document.getElementById('allergyDetail').value.trim();
+    if (!detail) {
+      showErr('err-allergy');
+      setInputErr('allergyDetail', true);
+      ok = false;
+    } else {
+      hideErr('err-allergy');
+      setInputErr('allergyDetail', false);
+    }
+  } else {
+    hideErr('err-allergy');
+    setInputErr('allergyDetail', false);
+  }
   return ok;
 }
 
@@ -695,6 +756,18 @@ function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+
+// ซ่อน/แสดง ช่องกรอกประวัติแพ้ยา
+function toggleAllergy() {
+  const isYes = document.querySelector('input[name="hasAllergy"]:checked').value === 'yes';
+  const detailInput = document.getElementById('allergyDetail');
+  detailInput.style.display = isYes ? 'block' : 'none';
+  if (isYes) detailInput.focus();
+}
+// ล็อกให้เลขบัตรประชาชน พิมพ์ได้แค่ตัวเลขเท่านั้น
+document.getElementById('idCard').addEventListener('input', function() {
+  this.value = this.value.replace(/[^0-9]/g, '');
+});
 
 // ─── Submit ───
 document.getElementById('regForm').addEventListener('submit', async function(e) {
@@ -720,6 +793,19 @@ try {
     params.append('dob',      getDOBString());
     params.append('age',      calcAge() ?? '');
     params.append('symptoms', document.getElementById('symptoms').value.trim());
+
+    // --- เริ่มโค้ดที่ต้องเพิ่มต่อท้าย ---
+    params.append('idCard',     document.getElementById('idCard').value.trim());
+    params.append('address',    document.getElementById('address').value.trim());
+    params.append('udHospital', document.getElementById('udHospital').value.trim());
+    params.append('udMedicine', document.getElementById('udMedicine').value.trim());
+    
+    // แปลงค่าจากปุ่ม Radio และช่องข้อความให้เป็น String ก้อนเดียวกัน
+    const allergyVal = document.querySelector('input[name="hasAllergy"]:checked').value;
+    const allergyData = allergyVal === 'yes' ? "มี: " + document.getElementById('allergyDetail').value.trim() : "ไม่มี";
+    params.append('allergy', allergyData);
+    
+    params.append('otherNotes', document.getElementById('otherNotes').value.trim());
 
     const imgFile = document.getElementById('imageInput').files[0];
     if (imgFile) {

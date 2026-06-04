@@ -24,6 +24,44 @@ function doPost(e) {
   try {
     const p = e.parameter;
     const action = p.action || "";
+    
+    // ==========================================
+    // ระบบ Login ตรวจสอบสิทธิ์การเข้าใช้งาน
+    // ==========================================
+    if (action === "login") {
+      const loginEmail = (p.email || "").trim().toLowerCase();
+      const loginPass  = (p.password || "").trim();
+
+      const ss = SpreadsheetApp.openById(SHEET_ID);
+      let staffSheet = ss.getSheetByName("Staff");
+
+      // ถ้ายังไม่มีชีต Staff ให้สร้างใหม่ และใส่รหัสผ่านแอดมินเริ่มต้นให้
+      if (!staffSheet) {
+        staffSheet = ss.insertSheet("Staff");
+        staffSheet.appendRow(["Email", "Password", "ชื่อพนักงาน", "สิทธิ์"]);
+        staffSheet.getRange(1, 1, 1, 4).setFontWeight("bold").setBackground("#3B82F6").setFontColor("#ffffff");
+        // สร้าง user เริ่มต้น (คุณสามารถไปแก้ใน Sheet ภายหลังได้)
+        staffSheet.appendRow(["admin@gmail.com", "123456", "ผู้ดูแลระบบ", "Admin"]);
+      }
+
+      const data = staffSheet.getDataRange().getValues();
+      
+      // วนลูปเช็คว่า Email และ Password ตรงกับในระบบหรือไม่
+      for (let i = 1; i < data.length; i++) {
+        const sheetEmail = String(data[i][0]).trim().toLowerCase();
+        const sheetPass  = String(data[i][1]).trim();
+        
+        if (sheetEmail === loginEmail && sheetPass === loginPass) {
+          return buildResponse({ 
+            status: "success", 
+            name: data[i][2], 
+            role: data[i][3],
+            message: "เข้าสู่ระบบสำเร็จ" 
+          });
+        }
+      }
+      return buildResponse({ status: "error", message: "ไม่มีสิทธิ์เข้าถึง หรือรหัสผ่านไม่ถูกต้อง" });
+    }
 
     // ==========================================
     // 1. เพิ่มฟีเจอร์: บันทึกประวัติการรักษา (History)
